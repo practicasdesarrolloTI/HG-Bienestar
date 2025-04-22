@@ -1,0 +1,215 @@
+.survey-container {
+  padding: 0rem 1.5rem;
+  font-family: "DM Sans", sans-serif;
+  min-height: 400px;
+}
+
+.survey-table {
+  width: 98%;
+  border-collapse: separate;
+  border-spacing: 0 0.4rem;
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+}
+
+.survey-table th {
+  border: none;
+  padding: 0.4rem;
+}
+.survey-table td {
+  padding: 0.55rem;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-right: none;
+  border-left: none;
+  border-top: none;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.intervene-btn {
+  background-color: #80006a;
+  color: white;
+  border: none;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.info-card {
+  justify-content: center;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 0px 2px rgb(255, 255, 255);
+  min-height: 550px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.export-buttons {
+  margin-bottom: 1rem;
+}
+.export-buttons button {
+  margin-right: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--soft-green);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.export-buttons button:hover {
+  background-color: var(--green);
+}
+.search-input {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  margin-right: 0.5rem;
+  width: 220px;
+}
+.filters {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.filters label {
+  font-weight: 500;
+}
+
+.filters select {
+  margin-left: 0.5rem;
+  padding: 0.3rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.filters-card label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.filters-card select {
+  margin-top: 0.3rem;
+}
+.filters-card {
+  display: flex;
+  justify-content: center;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 2rem 1rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 0px 2px rgb(255, 255, 255);
+}
+button:disabled {
+  background-color: var(--green) !important;
+  cursor: not-allowed;
+  color: #666;
+}
+.filters-card h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.filter-row {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.3rem;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.filter-row label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  font-size: 0.9rem;
+  min-width: 150px;
+}
+
+.filter-row select,
+.filter-row input {
+  margin-top: 0.3rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-left: 0.5rem;
+}
+.info-container {
+  padding: 0rem 0.1rem;
+}
+.riesgo-bajo {
+  background-color: var(--green); /* Verde */
+  color: white;
+}
+
+.riesgo-aumentado {
+  background-color: var(--soft-green); /* Verde claro */
+  color: white;
+}
+
+.riesgo-moderado {
+  background-color: var(--yellow); /* Amarillo */
+  color: black;
+}
+
+.riesgo-alto {
+  background-color: var(--soft-orange); /* Rosado */
+  color: black;
+}
+
+.riesgo-muy-alto {
+  background-color: var(--red); /* Rojo */
+  color: white;
+}
+
+.riesgo-sin-dato {
+  background-color: #f2f2f2;
+  color: #888;
+}
+
+.pagination {
+  margin-top: auto;
+  padding-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  background-color: var(--soft-green);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: var(--selected);
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.datepicker-input {
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+  width: 120px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}

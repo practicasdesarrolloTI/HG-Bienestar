@@ -1,0 +1,63 @@
+.zentria-sidebar {
+  background-color: var(--primary);
+  width: 180px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  
+  padding: 1.5rem 0rem;
+  border-right: 1px solid #e0e0e0;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.sidebar-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 3rem;
+
+}
+
+.sidebar-logo-img {
+  width: 60px;
+  filter: brightness(0) invert(1); 
+}
+.list-container {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;  
+
+
+}
+.zentria-sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.zentria-sidebar nav ul li {
+  margin-bottom: 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.4s ease;
+}
+
+.zentria-sidebar nav ul li:hover {
+  background-color: var(--selected);
+}
+
+.nav-link {
+  display: block;
+  color: var(--white);
+  text-decoration: none;
+  padding:1rem;
+  border-radius: 8px;
+}
+
+.zentria-sidebar nav ul li .nav-link.active {
+  background-color: var(--selected);
+  color: white;
+  font-weight: 600;
+}
