@@ -240,7 +240,7 @@ const SurveyTable: React.FC = () => {
         style={{ textAlign: "center", marginTop: "50px" }}
       >
         <ClipLoader color="#00B094" loading={loading} size={50} />
-        <p style={{ marginTop: "10px" }}>Cargando encuestas...</p>
+        <p style={{ marginTop: "10px" }}>Cargando ...</p>
       </div>
     );
   }
