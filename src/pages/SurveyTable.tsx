@@ -17,6 +17,7 @@ import "../styles/colors.css";
 import ClipLoader from "react-spinners/ClipLoader";
 import EmptyMessage from "../components/EmptyMessage";
 import InterventionModal from "../components/InterventionModal";
+import ErrorComponent from "../components/ErrorComponent";
 
 const agruparPorPacienteYPeriodo = (datos: SurveyResult[]): Agrupado[] => {
   const grupos: Agrupado[] = [];
@@ -245,10 +246,8 @@ const SurveyTable: React.FC = () => {
   }
 
   if (error) {
-    return (
-      <div className="error-message">
-        <p style={{ color: "red" }}>{error}</p>
-      </div>
+    return (  
+        <ErrorComponent message={error || 'Error al cargar la información'} />
     );
   }
 
