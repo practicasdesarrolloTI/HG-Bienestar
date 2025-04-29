@@ -1,23 +1,38 @@
 import React, { useState } from "react";
+import { registerUser } from "../services/authService";
 import "../styles/Auth.css";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage: React.FC = () => {
   const [cedula, setCedula] = useState("");
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const [role, setRole] = useState("user");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Cédula:", cedula);
-    console.log("Correo:", correo);
-    console.log("Contraseña:", contrasena);
-    // Aquí puedes llamar a tu API para registrar
+    try {
+      await registerUser(cedula, correo, contrasena, role);
+      alert("Registro exitoso, ¡ya puedes iniciar sesión!");
+      navigate("/"); // ✅ te lleva directamente al login
+    } catch (error: any) {
+      console.error(error);
+      alert(error.response?.data?.message || "Error en el registro");
+    }
   };
 
   return (
     <div className="auth-container">
       <h2>Registro</h2>
       <form onSubmit={handleSubmit}>
+        <label>
+          Rol:
+          <select value={role} onChange={(e) => setRole(e.target.value)} required>
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </label>
         <label>
           Cédula:
           <input

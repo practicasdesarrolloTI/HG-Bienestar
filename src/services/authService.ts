@@ -1,9 +1,16 @@
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8001/api";
 
-export const registerUser = async (username: string, password: string) => {
-  const response = await axios.post(`${API_URL}/auth/register`, { username, password });
+interface DecodedToken {
+  exp: number;
+  username: string;
+  userId: string;
+}
+
+export const registerUser = async (username: string, mail: string, password: string, role: string) => {
+  const response = await axios.post(`${API_URL}/auth/register`, { username, mail, password, role });
   return response.data;
 };
 
@@ -31,11 +38,29 @@ export const logoutUser = () => {
   localStorage.removeItem('user');
 };
 
-export const getToken = () => {
-  return localStorage.getItem('token');
+export const getToken = (): string | null => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const decoded = jwtDecode<DecodedToken>(token);
+    const now = Date.now() / 1000;
+
+    if (decoded.exp < now) {
+      logoutUser(); // 🔴 Token expirado → desloguear
+      return null;
+    }
+
+    return token;
+  } catch (err) {
+    logoutUser(); // 🔴 Token inválido → desloguear
+    return null;
+  }
 };
 
-export const getCurrentUser = () => {
-  const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
+export const getCurrentUser = (): { username: string; userId: string } | null => {
+  const token = getToken(); // <- ya valida expiración también
+  const user = localStorage.getItem("user");
+
+  return token && user ? JSON.parse(user) : null;
 };
