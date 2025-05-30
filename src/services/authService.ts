@@ -18,6 +18,7 @@ interface LoginResponse {
   token: string;
   username: string;
   userId: string;
+  role: string;
 }
 
 export const loginUser = async (username: string, password: string) => {
@@ -27,7 +28,8 @@ export const loginUser = async (username: string, password: string) => {
   localStorage.setItem('token', response.data.token);
   localStorage.setItem('user', JSON.stringify({
     username: response.data.username,
-    userId: response.data.userId
+    userId: response.data.userId,
+    role: response.data.role
   }));
 
   return response.data;

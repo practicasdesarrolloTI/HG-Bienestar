@@ -73,7 +73,7 @@ const MedicationsTable: React.FC = () => {
         <div className="filters-card">
           <div className="filter-row">
             <label>
-              Tipo de docuemnto:
+              Tipo de documento:
               <select
                 value={tipoFiltro}
                 onChange={(e) => setTipoFiltro(e.target.value)}
