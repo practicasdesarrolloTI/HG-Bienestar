@@ -18,6 +18,9 @@ import ClipLoader from "react-spinners/ClipLoader";
 import EmptyMessage from "../components/EmptyMessage";
 import InterventionModal from "../components/InterventionModal";
 import ErrorComponent from "../components/ErrorComponent";
+import { registrarIntervencion } from "../services/interventionService";
+import { getCurrentUser } from "../services/authService";
+
 
 const agruparPorPacienteYPeriodo = (datos: SurveyResult[]): Agrupado[] => {
   const grupos: Agrupado[] = [];
@@ -41,6 +44,8 @@ const agruparPorPacienteYPeriodo = (datos: SurveyResult[]): Agrupado[] => {
         grupoExistente.framingham = encuesta.framingham;
       if (encuesta.lawtonBrody !== null)
         grupoExistente.lawtonBrody = encuesta.lawtonBrody;
+      if (encuesta.moriskyGreen !== null)
+        grupoExistente.moriskyGreen = encuesta.moriskyGreen;
 
       // Si esta fecha es más reciente, actualiza la fecha principal del grupo
       if (fechaActual > parseISO(grupoExistente.fecha)) {
@@ -56,6 +61,7 @@ const agruparPorPacienteYPeriodo = (datos: SurveyResult[]): Agrupado[] => {
         findrisc: encuesta.findrisc,
         framingham: encuesta.framingham,
         lawtonBrody: encuesta.lawtonBrody,
+        moriskyGreen: encuesta.moriskyGreen,
       });
     }
   });
@@ -87,17 +93,25 @@ const getLawtonCategoria = (value: number | null): string => {
   return "Independiente";
 };
 
+const getmoriskyGreenCategoria = (value: number | null): string => {
+  if (value === null) return "Sin dato";
+  return value < 1 ? "Bajo" : "Alto";
+};
+
+
 const necesitaIntervencion = (row: SurveyResult | Agrupado): boolean => {
   const fr = getFindriscCategoria(row.findrisc);
   const fm = getFraminghamCategoria(row.framingham);
   const lb = getLawtonCategoria(row.lawtonBrody);
+  const mog = getmoriskyGreenCategoria(row.moriskyGreen ?? null);
 
   return (
     fr === "Alto" ||
     fr === "Muy Alto" ||
     fm === "Alto" ||
     lb === "Dependencia Total" ||
-    lb === "Dependencia Moderada"
+    lb === "Dependencia Moderada" ||
+    mog === "Alto"
   );
 };
 
@@ -107,6 +121,7 @@ const SurveyTable: React.FC = () => {
   const [findriscFiltro, setFindriscFiltro] = useState("");
   const [framinghamFiltro, setFraminghamFiltro] = useState("");
   const [lawtonFiltro, setLawtonFiltro] = useState("");
+  const [moriskyGreenFiltro, setmoriskyGreenFiltro] = useState("");
   const [fechaInicio, setFechaInicio] = useState<Date | null>(null);
   const [fechaFin, setFechaFin] = useState<Date | null>(null);
   const [intervencionFiltro, setIntervencionFiltro] = useState("");
@@ -149,7 +164,7 @@ const SurveyTable: React.FC = () => {
         });
     };
 
-    cargarDatos(); // primera carga inmediata
+    cargarDatos(); // primera carga inmogiata
 
     const intervalo = setInterval(() => {
       cargarDatos();
@@ -157,6 +172,38 @@ const SurveyTable: React.FC = () => {
 
     return () => clearInterval(intervalo);
   }, []);
+  
+
+  const handleRegistrarIntervencion = async (detalles: string) => {
+  if (!selectedPatient) return;
+  const usuario = getCurrentUser();
+
+  console.log("📋 Registrando intervención:", {
+    tipoIdentificacion: selectedPatient.tipoIdentificacion,
+    identificacion: selectedPatient.identificacion,
+    nombre: selectedPatient.nombre,
+    detalles,
+    usuario: usuario?.username || "",
+    fecha: selectedPatient.fecha
+  });
+
+  try {
+    await registrarIntervencion(
+      selectedPatient.tipoIdentificacion,
+      selectedPatient.identificacion,
+      selectedPatient.nombre || "",
+      detalles,
+      usuario?.username || "",
+      selectedPatient.fecha
+    );
+    alert("✅ Intervención registrada");
+  } catch (err) {
+    alert("❌ Error al guardar intervención");
+  }
+};
+
+
+
 
   const filteredData = datosAgrupados.filter((row) => {
     const fechaEncuesta = parseISO(row.fecha);
@@ -165,16 +212,21 @@ const SurveyTable: React.FC = () => {
       (tipoFiltro === "" || row.tipoIdentificacion === tipoFiltro) &&
       (escalaSeleccionada === "findrisc"
         ? findriscFiltro === "" ||
-          getFindriscCategoria(row.findrisc) === findriscFiltro
+        getFindriscCategoria(row.findrisc) === findriscFiltro
         : true) &&
       (escalaSeleccionada === "framingham"
         ? framinghamFiltro === "" ||
-          getFraminghamCategoria(row.framingham) === framinghamFiltro
+        getFraminghamCategoria(row.framingham) === framinghamFiltro
         : true) &&
       (escalaSeleccionada === "lawton"
         ? lawtonFiltro === "" ||
-          getLawtonCategoria(row.lawtonBrody) === lawtonFiltro
+        getLawtonCategoria(row.lawtonBrody) === lawtonFiltro
         : true) &&
+      (escalaSeleccionada === "moriskyGreen"
+        ? moriskyGreenFiltro === "" ||
+        getmoriskyGreenCategoria(row.moriskyGreen ?? null) === moriskyGreenFiltro
+        : true) &&
+
       (!fechaInicio ||
         !fechaFin ||
         isWithinInterval(fechaEncuesta, {
@@ -214,6 +266,7 @@ const SurveyTable: React.FC = () => {
       FINDRISC: row.findrisc ?? "-",
       Framingham: row.framingham ?? "-",
       LawtonBrody: row.lawtonBrody ?? "-",
+      moriskyGreen: row.moriskyGreen ?? "-",
       Fecha: format(parseISO(row.fecha), "dd/MM/yyyy"),
       Intervención: necesitaIntervencion(row) ? "Sí" : "No",
     }));
@@ -246,8 +299,8 @@ const SurveyTable: React.FC = () => {
   }
 
   if (error) {
-    return (  
-        <ErrorComponent message={error || 'Error al cargar la información'} />
+    return (
+      <ErrorComponent message={error || 'Error al cargar la información'} />
     );
   }
 
@@ -277,6 +330,12 @@ const SurveyTable: React.FC = () => {
     if (value >= 3) return "riesgo-alto";
     return "riesgo-muy-alto";
   };
+
+  const getMoriskyGreenColorClass = (value: number | null | undefined): string => {
+    if (value === null || value === undefined) return "riesgo-sin-dato";
+    return value < 1 ? "riesgo-bajo" : "riesgo-alto";
+  };
+
 
   return (
     <div className="survey-container">
@@ -312,6 +371,7 @@ const SurveyTable: React.FC = () => {
                 <option value="findrisc">FINDRISC</option>
                 <option value="framingham">Framingham</option>
                 <option value="lawton">Lawton-Brody</option>
+                <option value="moriskyGreen">Morisky-Green</option>
               </select>
             </label>
 
@@ -365,6 +425,21 @@ const SurveyTable: React.FC = () => {
                 </select>
               </label>
             )}
+            {escalaSeleccionada === "moriskyGreen" && (
+              <label>
+                Indicador moriskyGreen:
+                <select
+                  value={moriskyGreenFiltro}
+                  onChange={(e) => setmoriskyGreenFiltro(e.target.value)}
+                >
+                  <option value="">Todos</option>
+                  <option value="Bajo">Bajo</option>
+                  <option value="Alto">Alto</option>
+                  <option value="Sin dato">Sin dato</option>
+                </select>
+              </label>
+            )}
+
 
             <label>
               Fecha Inicial:
@@ -428,7 +503,8 @@ const SurveyTable: React.FC = () => {
                   <th>Nombre</th>
                   <th>FINDRISC</th>
                   <th>Framingham</th>
-                  <th>LawtonBrody</th>
+                  <th>Lawton-Brody</th>
+                  <th>Morisky-Green</th>
                   <th>Fecha</th>
                   <th>Intervención</th>
                 </tr>
@@ -455,6 +531,13 @@ const SurveyTable: React.FC = () => {
                         ? d.lawtonBrody
                         : "-"}
                     </td>
+
+                    <td className={getMoriskyGreenColorClass(d.moriskyGreen ?? null)}>
+                      {d.moriskyGreen !== null && d.moriskyGreen !== undefined
+                        ? d.moriskyGreen
+                        : "-"}
+                    </td>
+
                     <td>{format(parseISO(d.fecha), "dd/MM/yyyy")}</td>
                     <td style={{ fontWeight: "bold", textAlign: "center" }}>
                       {necesitaIntervencion(d) ? (
@@ -492,14 +575,7 @@ const SurveyTable: React.FC = () => {
                       <InterventionModal
                         isOpen={isModalOpen}
                         onClose={() => setIsModalOpen(false)}
-                        onSave={(text) => {
-                          console.log(
-                            "Texto de intervención para:",
-                            selectedPatient?.identificacion
-                          );
-                          console.log("Intervención:", text);
-                          // Aquí podrías hacer una petición al backend para guardar la intervención
-                        }}
+                        onSave={handleRegistrarIntervencion}
                       />
                     </td>
                   </tr>

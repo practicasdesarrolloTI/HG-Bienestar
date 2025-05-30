@@ -5,6 +5,7 @@ import LoginPage from "./pages/LogInPage";
 import RegisterPage from "./pages/RegisterPage";
 import SurveyTable from "./pages/SurveyTable";
 import MedicationsTable from "./pages/MedicationsTable";
+import UserManagement from "./pages/UserManagement";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -36,6 +37,11 @@ const App: React.FC = () => {
         <Route path="/medicamentos" element={
           isAuthenticated
             ? <Layout><MedicationsTable /></Layout>
+            : <Navigate to="/" replace />
+        } />
+        <Route path="/maestros" element={
+          isAuthenticated
+            ? <Layout><UserManagement /></Layout>
             : <Navigate to="/" replace />
         } />
       </Routes>

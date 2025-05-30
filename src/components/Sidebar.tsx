@@ -23,6 +23,11 @@ const Sidebar: React.FC = () => {
                 Medicamentos
               </NavLink>
             </li>
+            <li>
+              <NavLink to="/maestros" className="nav-link">
+                Maestros
+              </NavLink>
+            </li>
           </ul>
         </nav>
       </div>

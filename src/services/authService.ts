@@ -59,8 +59,36 @@ export const getToken = (): string | null => {
 };
 
 export const getCurrentUser = (): { username: string; userId: string } | null => {
-  const token = getToken(); // <- ya valida expiración también
+  const token = getToken();
   const user = localStorage.getItem("user");
 
   return token && user ? JSON.parse(user) : null;
+};
+
+export interface User {
+  _id: string;
+  username: string;
+  mail: string;
+  password?: string; // Opcional, no se envía al cliente
+  role: string;
+}
+
+export const fetchUsers = async (): Promise<User[]> => {
+  const token = getToken();
+  const response = await axios.get<User[]>(`${API_URL}/auth/users`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const createUser = async (username: string, mail: string, password: string, role: string) => {
+  const token = getToken();
+  const response = await axios.post(
+    `${API_URL}/auth/register`,
+    { username, mail, password, role },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
 };

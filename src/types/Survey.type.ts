@@ -6,6 +6,7 @@ export interface SurveyResult {
   findrisc: number | null;
   framingham: number | null;
   lawtonBrody: number | null;
+  moriskyGreen?: number | null;
   fecha: string;
 }
 
@@ -17,4 +18,5 @@ export type Agrupado = {
   findrisc: number | null;
   framingham: number | null;
   lawtonBrody: number | null;
+  moriskyGreen?: number | null;
 };
