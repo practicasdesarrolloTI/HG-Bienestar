@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import DatePicker from "react-datepicker";
@@ -10,7 +10,11 @@ import {
   differenceInMonths,
 } from "date-fns";
 import "../styles/SurveyTable.css";
-import { FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
+import {
+  CheckCircleIcon,
+  XCircleIcon,
+  AlertCircleIcon,
+} from 'lucide-react'
 import { getSurveyResults } from "../services/surveyResultService";
 import { SurveyResult, Agrupado } from "../types/Survey.type";
 import "../styles/colors.css";
@@ -18,9 +22,9 @@ import ClipLoader from "react-spinners/ClipLoader";
 import EmptyMessage from "../components/EmptyMessage";
 import InterventionModal from "../components/InterventionModal";
 import ErrorComponent from "../components/ErrorComponent";
-import { registrarIntervencion } from "../services/interventionService";
+import { registrarIntervencion, getIntervenciones } from "../services/interventionService";
 import { getCurrentUser } from "../services/authService";
-
+import { Intervencion } from "../types/Intervenciones.type";
 
 const agruparPorPacienteYPeriodo = (datos: SurveyResult[]): Agrupado[] => {
   const grupos: Agrupado[] = [];
@@ -95,7 +99,7 @@ const getLawtonCategoria = (value: number | null): string => {
 
 const getmoriskyGreenCategoria = (value: number | null): string => {
   if (value === null) return "Sin dato";
-  return value < 1 ? "Bajo" : "Alto";
+  return value === 1 ? "Bajo" : "Alto";
 };
 
 
@@ -125,6 +129,7 @@ const SurveyTable: React.FC = () => {
   const [fechaInicio, setFechaInicio] = useState<Date | null>(null);
   const [fechaFin, setFechaFin] = useState<Date | null>(null);
   const [intervencionFiltro, setIntervencionFiltro] = useState("");
+  const [intervenciones, setIntervenciones] = useState<Intervencion[]>([]);
   const [data, setData] = useState<SurveyResult[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -139,68 +144,121 @@ const SurveyTable: React.FC = () => {
     null
   );
 
+  const [interventionText, setInterventionText] = useState("");
+
+
   const datosAgrupados = agruparPorPacienteYPeriodo(data);
+
+  // Indicadores para la cabecera
+  const totalPacientesEncuestados = datosAgrupados.length;
+  const totalEncuestasCompletadas = data.length;
+
+
+  // Pacientes que requieren intervención
+  const pacientesQueRequierenIntervencion = datosAgrupados.filter(row =>
+    necesitaIntervencion(row)
+  );
+
+  // Pacientes que ya tienen intervención (cruce con intervenciones)
+  const pacientesConIntervencion = pacientesQueRequierenIntervencion.filter(row =>
+    intervenciones.some(interv =>
+      interv.pacienteTipo === row.tipoIdentificacion &&
+      interv.pacienteNumero === row.identificacion &&
+      interv.fechaEncuesta === row.fecha
+    )
+  );
+
+  const pacientesSinIntervencion = pacientesQueRequierenIntervencion.length - pacientesConIntervencion.length;
+
+  const intervencionesRealizadas = pacientesConIntervencion.length;
+
+
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
+  const cargarDatos = useCallback(() => {
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      getSurveyResults(),
+      getIntervenciones()
+    ])
+      .then(([resEncuestas, resIntervenciones]) => {
+        setData(resEncuestas);
+        // Mapear correctamente las intervenciones
+        const intervencionesMapeadas = resIntervenciones.map((item: any) => ({
+          id: item._id,
+          pacienteTipo: item.pacienteTipo,
+          pacienteNumero: item.pacienteNumero,
+          pacienteNombre: item.pacienteNombre,
+          detalles: item.detalles ?? item.texto ?? "",
+          realizadaPor: item.realizadaPor,
+          fechaEncuesta: item.fechaEncuesta,
+          fechaIntervencion: item.fechaIntervencion,
+          cerrada: item.cerrada || false
+        }));
+
+        setIntervenciones(intervencionesMapeadas);
+        setUltimaActualizacion(new Date());
+        console.log("📊 Datos actualizados:", resEncuestas);
+        console.log("📝 Intervenciones:", resIntervenciones);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error actualizando datos:", err);
+        setError("No se pudo cargar la información.");
+        setLoading(false);
+      });
+  }, []);
+
   useEffect(() => {
-    const cargarDatos = () => {
-      setLoading(true);
-      setError(null);
-
-      getSurveyResults()
-        .then((res) => {
-          setData(res);
-          setUltimaActualizacion(new Date());
-          console.log("📊 Datos actualizados:", res);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Error actualizando encuestas:", err);
-          setError("No se pudo cargar la información.");
-          setLoading(false);
-        });
-    };
-
-    cargarDatos(); // primera carga inmogiata
+    cargarDatos();
 
     const intervalo = setInterval(() => {
       cargarDatos();
-    }, 600000); // 10 minutos
+    }, 60000);
 
     return () => clearInterval(intervalo);
   }, []);
-  
+
+
 
   const handleRegistrarIntervencion = async (detalles: string) => {
-  if (!selectedPatient) return;
-  const usuario = getCurrentUser();
+    if (!selectedPatient) return;
+    const usuario = getCurrentUser();
 
-  console.log("📋 Registrando intervención:", {
-    tipoIdentificacion: selectedPatient.tipoIdentificacion,
-    identificacion: selectedPatient.identificacion,
-    nombre: selectedPatient.nombre,
-    detalles,
-    usuario: usuario?.username || "",
-    fecha: selectedPatient.fecha
-  });
-
-  try {
-    await registrarIntervencion(
-      selectedPatient.tipoIdentificacion,
-      selectedPatient.identificacion,
-      selectedPatient.nombre || "",
+    console.log("📋 Registrando intervención:", {
+      tipoIdentificacion: selectedPatient.tipoIdentificacion,
+      identificacion: selectedPatient.identificacion,
+      nombre: selectedPatient.nombre,
       detalles,
-      usuario?.username || "",
-      selectedPatient.fecha
-    );
-    alert("✅ Intervención registrada");
-  } catch (err) {
-    alert("❌ Error al guardar intervención");
-  }
-};
+      usuario: usuario?.username || "",
+      fecha: selectedPatient.fecha
+    });
+
+    try {
+      await registrarIntervencion(
+        selectedPatient.tipoIdentificacion,
+        selectedPatient.identificacion,
+        selectedPatient.nombre || "",
+        detalles,
+        usuario?.username || "",
+        selectedPatient.fecha
+      );
+      alert("✅ Intervención registrada");
+
+
+      setIsModalOpen(false); // cerrar modal
+      setInterventionText(""); // limpiar text
+      setSelectedPatient(null); // opcional: limpiar el selectedPatient
+      cargarDatos(); // refrescar datos
+    } catch (err) {
+      alert("❌ Error al guardar intervención");
+    }
+  };
 
 
 
@@ -333,13 +391,37 @@ const SurveyTable: React.FC = () => {
 
   const getMoriskyGreenColorClass = (value: number | null | undefined): string => {
     if (value === null || value === undefined) return "riesgo-sin-dato";
-    return value < 1 ? "riesgo-bajo" : "riesgo-alto";
+    return value === 1 ? "riesgo-bajo" : "riesgo-alto";
   };
 
 
   return (
     <div className="survey-container">
       <h2>Encuestas Diligenciadas</h2>
+      <div className="dashboard-counters" style={{
+        display: "flex",
+        justifyContent: "space-around",
+        marginBottom: "1rem",
+        flexWrap: "wrap",
+        gap: "1rem"
+      }}>
+        <div className="counter-card" style={{ background: "#00B094", color: "#fff", padding: "1rem", borderRadius: "8px" }}>
+          <strong>Total pacientes:</strong> {totalPacientesEncuestados}
+        </div>
+        <div className="counter-card" style={{ background: "#80006A", color: "#fff", padding: "1rem", borderRadius: "8px" }}>
+          <strong>Encuestas completadas:</strong> {totalEncuestasCompletadas}
+        </div>
+        <div className="counter-card" style={{ background: "#FF5F3F", color: "#fff", padding: "1rem", borderRadius: "8px" }}>
+          <strong>Pacientes que requieren intervención:</strong> {pacientesQueRequierenIntervencion.length}
+        </div>
+        <div className="counter-card" style={{ background: "#FFB5A6", color: "#000", padding: "1rem", borderRadius: "8px" }}>
+          <strong>Pacientes sin intervención:</strong> {pacientesSinIntervencion}
+        </div>
+        <div className="counter-card" style={{ background: "#45E3C9", color: "#000", padding: "1rem", borderRadius: "8px" }}>
+          <strong>Intervenciones realizadas:</strong> {intervencionesRealizadas}
+        </div>
+      </div>
+
       <div className="info-container">
         <div className="filters-card">
           <div className="filter-row">
@@ -539,44 +621,88 @@ const SurveyTable: React.FC = () => {
                     </td>
 
                     <td>{format(parseISO(d.fecha), "dd/MM/yyyy")}</td>
-                    <td style={{ fontWeight: "bold", textAlign: "center" }}>
-                      {necesitaIntervencion(d) ? (
-                        <button
-                          onClick={() => {
-                            setSelectedPatient({
-                              _id: "",
-                              tipoIdentificacion: d.tipoIdentificacion,
-                              identificacion: d.identificacion,
-                              nombre: d.nombre,
-                              findrisc: d.findrisc,
-                              framingham: d.framingham,
-                              lawtonBrody: d.lawtonBrody,
-                              fecha: d.fecha,
-                            });
-                            setIsModalOpen(true);
-                          }}
-                          style={{
-                            background: "transparent",
-                            border: "none",
-                            cursor: "pointer",
-                          }}
-                          title="Registrar intervención"
-                        >
-                          <FaExclamationTriangle
-                            style={{ color: "#FF5F3F", fontSize: "1.2rem" }}
-                          />
-                        </button>
-                      ) : (
-                        <FaCheckCircle
-                          style={{ color: "#00B094", fontSize: "1.2rem" }}
-                          title="Sin intervención"
-                        />
-                      )}
-                      <InterventionModal
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        onSave={handleRegistrarIntervencion}
-                      />
+                    <td style={{ fontWeight: "bold", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                      {(() => {
+                        const necesita = necesitaIntervencion(d);
+
+                        const intervencionesPaciente = intervenciones.filter(interv =>
+                          interv.pacienteTipo === d.tipoIdentificacion &&
+                          interv.pacienteNumero === d.identificacion &&
+                          interv.fechaEncuesta === d.fecha
+                        );
+
+                        const estaCerrada = intervencionesPaciente.some(interv => interv.cerrada);
+
+                        if (!necesita) {
+                          // No requiere intervención
+                          return (
+                            <>
+                              <XCircleIcon style={{ color: "#9E9E9E", fontSize: "0.95rem" }} aria-label="No requerida" />
+                              <span style={{ color: "#666", fontSize: "0.95rem" }}>No requerida</span>
+                            </>
+                          );
+                        } else if (estaCerrada) {
+                          // Ya completada
+                          return (
+                            <>
+                              <CheckCircleIcon style={{ color: "#00C853", fontSize: "0.95rem" }} aria-label="Completada" />
+                              <span style={{ color: "#666", fontSize: "0.95rem" }}>Completada</span>
+                            </>
+                          );
+                        } else {
+                          // Pendiente (botón de intervención)
+                          return (
+                            <>
+                              <button
+                                onClick={() => {
+                                  setSelectedPatient({
+                                    _id: "",
+                                    tipoIdentificacion: d.tipoIdentificacion,
+                                    identificacion: d.identificacion,
+                                    nombre: d.nombre,
+                                    findrisc: d.findrisc,
+                                    framingham: d.framingham,
+                                    lawtonBrody: d.lawtonBrody,
+                                    fecha: d.fecha,
+                                  });
+                                  setInterventionText("");
+                                  setIsModalOpen(true);
+                                }}
+                                style={{
+                                  background: "transparent",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "6px"
+                                }}
+                                title="Registrar intervención"
+                              >
+                                <AlertCircleIcon style={{ color: "#FF0000", fontSize: "0.95rem" }} />
+                                <span style={{ color: "#FF0000", fontSize: "0.95rem" }}>Pendiente</span>
+                              </button>
+
+                              <InterventionModal
+                                key={selectedPatient ? `${selectedPatient.tipoIdentificacion}-${selectedPatient.identificacion}-${selectedPatient.fecha}` : "empty"}
+                                isOpen={isModalOpen}
+                                onClose={() => {
+                                  setIsModalOpen(false);
+                                  setInterventionText("");
+                                  setSelectedPatient(null);
+                                }}
+                                onSave={handleRegistrarIntervencion}
+                                intervencionesAnteriores={selectedPatient ? intervenciones.filter(interv =>
+                                  interv.pacienteTipo === selectedPatient.tipoIdentificacion &&
+                                  interv.pacienteNumero === selectedPatient.identificacion
+                                ) : []}
+                                onRefresh={cargarDatos}
+                                text={interventionText}
+                                setText={setInterventionText}
+                              />
+                            </>
+                          );
+                        }
+                      })()}
                     </td>
                   </tr>
                 ))}

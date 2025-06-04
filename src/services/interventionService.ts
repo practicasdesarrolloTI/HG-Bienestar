@@ -1,7 +1,8 @@
 import axios from "axios";
 import { getToken } from "./authService";
+import { Intervencion } from "../types/Intervenciones.type";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8001/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8001/api/intervenciones";
 
 export const registrarIntervencion = async (
   pacienteTipo: string,
@@ -13,7 +14,7 @@ export const registrarIntervencion = async (
 ) => {
   const token = getToken();
   const response = await axios.post(
-    `${API_URL}/intervenciones`,
+    `${API_URL}/Upload`,
     {
       pacienteTipo,
       pacienteNumero,
@@ -26,5 +27,16 @@ export const registrarIntervencion = async (
       headers: { Authorization: `Bearer ${token}` }
     }
   );
+  return response.data;
+};
+
+export const getIntervenciones = async (): Promise<Intervencion[]> => {
+  const response = await axios.get<Intervencion[]>(`${API_URL}/GetAll`);
+  console.log("Intervenciones obtenidas:", response.data);
+  return response.data;
+};
+
+export const cerrarIntervencion = async (id: string) => {
+  const response = await axios.put(`${API_URL}/Close/${id}`);
   return response.data;
 };

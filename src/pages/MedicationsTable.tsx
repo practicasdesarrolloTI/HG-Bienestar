@@ -226,8 +226,11 @@ const MedicationsTable: React.FC = () => {
           console.log("Paciente:", selectedRow?.identificacion);
           console.log("Intervención guardada:", text);
           // Aquí puedes enviar `text` al backend si es necesario
-        }}
-      />
+        } } intervencionesAnteriores={[]} onRefresh={function (): void {
+          throw new Error("Function not implemented.");
+        } } text={""} setText={function (_text: string): void {
+          throw new Error("Function not implemented.");
+        } }      />
     </div>
   );
 };
