@@ -29,21 +29,22 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { toast } from "react-toastify";
+import "../styles/BannerUploadModal.css";
 
 
-const style = {
-    position: "absolute" as const,
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "80%",
-    maxHeight: "90%",
-    overflowY: "auto",
-    bgcolor: "background.paper",
-    boxShadow: 24,
-    p: 4,
-    borderRadius: "8px"
-};
+// const style = {
+//     position: "absolute" as const,
+//     top: "50%",
+//     left: "50%",
+//     transform: "translate(-50%, -50%)",
+//     width: "80%",
+//     maxHeight: "90%",
+//     overflowY: "auto",
+//     bgcolor: "background.paper",
+//     boxShadow: 24,
+//     p: 4,
+//     borderRadius: "8px"
+// };
 
 interface Props {
     open: boolean;
@@ -99,14 +100,14 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
         setLoadingSubmit(true);
         try {
             await subirBanner(title, imageFile);
-            toast.success("✅ Banner subido correctamente");
+            toast.success("Banner subido correctamente");
             setTitle("");
             setImageFile(null);
             setPreview(null);
             loadBanners();
         } catch (err) {
             console.error("Error al subir banner:", err);
-            toast.error("❌ Error al subir el banner");
+            toast.error("Error al subir el banner");
         } finally {
             setLoadingSubmit(false);
         }
@@ -142,13 +143,13 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
         setLoadingUpdateId(id);
         try {
             await actualizarBanner(id, editTitle, editImageFile || undefined);
-            toast.success("✅ Banner actualizado");
+            toast.success("Banner actualizado");
             setEditandoId(null);
             setEditImageFile(null);
             loadBanners();
         } catch (err) {
             console.error("Error al actualizar banner", err);
-            toast.error("❌ Error al actualizar");
+            toast.error("Error al actualizar");
         } finally {
             setEditPreview(null);
             setLoadingUpdateId(null);
@@ -168,12 +169,12 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
         setLoadingDeleteId(confirmarEliminarId);
         try {
             await eliminarBanner(confirmarEliminarId);
-            toast.success("✅ Banner eliminado");
+            toast.success("Banner eliminado");
             setConfirmarEliminarId(null);
             loadBanners();
         } catch (err) {
             console.error("Error al eliminar banner", err);
-            toast.error("❌ Error al eliminar");
+            toast.error("Error al eliminar");
         } finally {
             setLoadingDeleteId(null);
         }
@@ -183,11 +184,11 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
         setLoadingActivateId(id);
         try {
             await activarBanner(id);
-            toast.success("✅ Banner activado");
+            toast.success("Banner activado");
             loadBanners();
         } catch (err) {
             console.error("Error al activar banner", err);
-            toast.error("❌ Error al activar");
+            toast.error("Error al activar");
         } finally {
             setLoadingActivateId(null);
         }
@@ -196,7 +197,7 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
 
     return (
         <Modal open={open} onClose={onClose}>
-            <Box sx={style}>
+            <Box className="banner-modal">
                 <Typography variant="h4" gutterBottom>Gestión de Banners</Typography>
 
                 {/* Formulario nuevo banner */}
@@ -213,7 +214,7 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
                     <Button
                         variant="contained"
                         component="label"
-                        sx={{ mt: 2, mb: 2, backgroundColor: "var(--primary)", color: "var(--white)" }}
+                        className="banner-upload-button"
                     >
                         Seleccionar Imagen
                         <input
@@ -240,7 +241,7 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
                         variant="contained"
                         fullWidth
                         disabled={loadingSubmit}
-                        sx={{ backgroundColor: "var(--primary)", color: "var(--white)" }}
+                        className="banner-submit-button"
                     >
                         {loadingSubmit ? "Subiendo..." : "Subir Banner"}
                     </Button>
@@ -249,22 +250,9 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
                 {/* Tabla de banners */}
                 <Typography variant="h6" mt={4} gutterBottom>Banners</Typography>
                 <Table>
-                    <TableHead sx={{
-                        backgroundColor: "var(--primary)",
-                        "& .MuiTableCell-head": {
-                            color: "var(--white)",
-                            fontWeight: "bold",
-                            fontSize: "14px",
-                            textTransform: "uppercase"
-                        }
-                    }}>
+                    <TableHead className="banner-table-header">
                         <TableRow
-                            hover
-                            sx={{
-                                "&:hover": {
-                                    backgroundColor: "var(--light-gray)"
-                                }
-                            }}>
+                            >
                             <TableCell>Imagen</TableCell>
                             <TableCell>Título</TableCell>
                             <TableCell>Ultima Actualización</TableCell>
@@ -275,25 +263,15 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
                     <TableBody>
                         {loadingBanners ? (
                             <TableRow
-                                hover
-                                sx={{
-                                    "&:hover": {
-                                        backgroundColor: "var(--light-gray)"
-                                    }
-                                }}>
+                                className="banner-table-row">
                                 <TableCell colSpan={3} align="center">
                                     <CircularProgress />
                                 </TableCell>
                             </TableRow>
                         ) : banners.map((banner: any) => (
-                            <TableRow key={banner.id}
-                                hover
-                                sx={{
-                                    "&:hover": {
-                                        backgroundColor: "var(--light-gray)"
-                                    }
-                                }} >
-                                <TableCell sx={{ fontSize: "14px", padding: "12px 16px" }}>
+                            <TableRow key={banner.id}           
+                                className="banner-table-row">
+                                <TableCell className="banner-table-cell">
                                     <Avatar
                                         src={
                                             editandoId === banner.id && editPreview
@@ -304,7 +282,7 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
                                         sx={{ width: 200, height: 100 }}
                                     />
                                 </TableCell>
-                                <TableCell sx={{ fontSize: "14px", padding: "12px 16px" }}>
+                                <TableCell className="banner-table-cell">
                                     {editandoId === banner.id ? (
                                         <TextField
                                             value={editTitle}
@@ -315,7 +293,7 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
                                         banner.title
                                     )}
                                 </TableCell>
-                                <TableCell sx={{ fontSize: "14px", padding: "12px 16px" }}>
+                                <TableCell className="banner-table-cell">
                                     {banner.Fecha_Actualizacion
                                         ? new Date(banner.Fecha_Actualizacion).toLocaleString("es-CO", {
                                             day: "2-digit",
@@ -326,21 +304,21 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
                                         })
                                         : "-"}
                                 </TableCell>
-                                <TableCell sx={{ fontSize: "14px", padding: "12px 16px" }}>
+                                <TableCell className="banner-table-cell">
                                     {banner.active ? (
                                         <Chip label="Habilitado" color="success" />
                                     ) : (
                                         <Chip label="Deshabilitado" color="default" />
                                     )}
                                 </TableCell>
-                                <TableCell sx={{ fontSize: "14px", padding: "12px 16px" }}>
+                                <TableCell className="banner-table-cell">
                                     {editandoId === banner.id ? (
                                         <>
                                             <Button
                                                 variant="contained"
                                                 component="label"
                                                 size="small"
-                                                sx={{ mr: 1 }}
+                                                className="banner-edit-image-button"
                                             >
                                                 Cambiar Imagen
                                                 <input
@@ -356,7 +334,7 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
                                                 color="success"
                                                 onClick={() => handleActualizar(banner.id)}
                                                 disabled={loadingUpdateId === banner.id}
-                                                sx={{ mr: 1 }}
+                                                className="banner-save-button"
                                             >
                                                 {loadingUpdateId === banner.id ? "Actualizando..." : "Guardar"}
                                             </Button>
@@ -419,11 +397,11 @@ const BannerUploadModal: React.FC<Props> = ({ open, onClose }) => {
                     open={Boolean(confirmarEliminarId)}
                     onClose={() => setConfirmarEliminarId(null)}
                 >
-                    <DialogTitle>Confirmar eliminación</DialogTitle>
-                    <DialogContent>
+                    <DialogTitle className="banner-dialog-title">Confirmar eliminación</DialogTitle>
+                    <DialogContent className="banner-dialog-content">
                         ¿Estás seguro que deseas eliminar este banner?
                     </DialogContent>
-                    <DialogActions>
+                    <DialogActions className="banner-dialog-actions">
                         <Button onClick={() => setConfirmarEliminarId(null)}>Cancelar</Button>
                         <Button
                             color="error"

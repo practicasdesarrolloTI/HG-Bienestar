@@ -13,13 +13,13 @@ import {
     TableCell,
     IconButton,
     Paper,
-    Alert
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { fetchUsers, createUser } from "../services/authService.ts";
 import axios from "axios";
 import { getToken } from "../services/authService";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { toast } from "react-toastify";
 
 interface User {
     _id: string;
@@ -53,8 +53,6 @@ const UserManagementModal: React.FC<Props> = ({ open, onClose }) => {
     const [mail, setMail] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("user");
-    const [mensaje, setMensaje] = useState<string | null>(null);
-    const [tipoMensaje, setTipoMensaje] = useState<"success" | "error">("success");
     const [editandoId, setEditandoId] = useState<string | null>(null);
     const [nuevoPassword, setNuevoPassword] = useState("");
     const [nuevoRol, setNuevoRol] = useState("user");
@@ -70,30 +68,26 @@ const UserManagementModal: React.FC<Props> = ({ open, onClose }) => {
 
     const handleRegister = async () => {
         if (!username || !password) {
-            setTipoMensaje("error");
-            setMensaje("Todos los campos son obligatorios");
+            toast.error("Todos los campos son obligatorios");
             return;
         }
 
         const existente = users.find((u: any) => u.username === username);
         if (existente) {
-            setTipoMensaje("error");
-            setMensaje("El nombre de usuario ya existe");
+            toast.error("El nombre de usuario ya existe");
             return;
         }
 
         try {
             await createUser(username, mail, password, role);
-            setTipoMensaje("success");
-            setMensaje("Usuario creado exitosamente");
+            toast.success("Usuario creado exitosamente");
             setUsername("");
             setMail("");
             setPassword("");
             setRole("user");
             loadUsers();
         } catch (err: any) {
-            setTipoMensaje("error");
-            setMensaje("Error al crear el usuario");
+            toast.error("Error al crear el usuario");
         }
     };
 
@@ -106,13 +100,11 @@ const UserManagementModal: React.FC<Props> = ({ open, onClose }) => {
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setMensaje("Usuario actualizado");
-            setTipoMensaje("success");
+            toast.success("Usuario actualizado");
             setEditandoId(null);
             loadUsers();
         } catch (err) {
-            setMensaje("Error al actualizar usuario");
-            setTipoMensaje("error");
+            toast.error("Error al actualizar usuario");
         }
     };
 
@@ -134,12 +126,6 @@ const UserManagementModal: React.FC<Props> = ({ open, onClose }) => {
         <Modal open={open} onClose={onClose}>
             <Box sx={modalStyle}>
                 <Typography variant="h4" gutterBottom>Gestión de Usuarios</Typography>
-
-                {mensaje && (
-                    <Alert severity={tipoMensaje} sx={{ mb: 2 }}>
-                        {mensaje}
-                    </Alert>
-                )}
 
                 <Box display="flex" gap={2} mb={3}>
                     <TextField

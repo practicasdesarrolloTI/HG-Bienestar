@@ -23,11 +23,11 @@ const Sidebar: React.FC<SidebarProps> = ({ userRole }) => {
                 Encuestas
               </NavLink>
             </li>
-            <li>
+            {/* <li>
               <NavLink to="/medicamentos" className="nav-link">
                 Medicamentos
               </NavLink>
-            </li>
+            </li> */}
             {userRole === "admin" && (
               <li>
                 <NavLink to="/maestros" className="nav-link">

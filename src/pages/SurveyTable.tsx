@@ -25,6 +25,7 @@ import ErrorComponent from "../components/ErrorComponent";
 import { registrarIntervencion, getIntervenciones } from "../services/interventionService";
 import { getCurrentUser } from "../services/authService";
 import { Intervencion } from "../types/Intervenciones.type";
+import { toast } from "react-toastify";
 
 const agruparPorPacienteYPeriodo = (datos: SurveyResult[]): Agrupado[] => {
   const grupos: Agrupado[] = [];
@@ -248,7 +249,7 @@ const SurveyTable: React.FC = () => {
         usuario?.username || "",
         selectedPatient.fecha
       );
-      alert("✅ Intervención registrada");
+      toast.success("Intervención registrada");
 
 
       setIsModalOpen(false); // cerrar modal
@@ -256,7 +257,7 @@ const SurveyTable: React.FC = () => {
       setSelectedPatient(null); // opcional: limpiar el selectedPatient
       cargarDatos(); // refrescar datos
     } catch (err) {
-      alert("❌ Error al guardar intervención");
+      toast.error("Error al guardar intervención");
     }
   };
 

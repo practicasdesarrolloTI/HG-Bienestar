@@ -3,6 +3,7 @@ import "../styles/InterventionModal.css";
 import { Intervencion } from "../types/Intervenciones.type";
 import { format, parseISO } from "date-fns";
 import { cerrarCasoIntervenciones } from "../services/interventionService";
+import { toast } from "react-toastify";
 
 interface InterventionModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ const InterventionModal: React.FC<InterventionModalProps> = ({
 
   const handleSave = async () => {
     if (!text.trim()) {
-      alert("Por favor ingrese el detalle de la intervención.");
+      toast.error("Por favor ingrese el detalle de la intervención.");
       return;
     }
     onSave(text);
@@ -39,7 +40,7 @@ const InterventionModal: React.FC<InterventionModalProps> = ({
 
   const handleCerrarIntervencion = async () => {
     if (intervencionesAnteriores.length === 0 && !text.trim()) {
-      alert("Debe ingresar al menos una intervención para cerrar el caso.");
+      toast.error("Debe ingresar al menos una intervención para cerrar el caso.");
       return;
     }
 
@@ -47,7 +48,7 @@ const InterventionModal: React.FC<InterventionModalProps> = ({
       try {
         // 1️⃣ Guardar la intervención actual (si hay texto)
         if (text.trim()) {
-          await onSave(text);
+          onSave(text);
         }
 
         // 2️⃣ Cerrar TODAS las intervenciones de este paciente
@@ -55,21 +56,20 @@ const InterventionModal: React.FC<InterventionModalProps> = ({
         const pacienteNumero = intervencionesAnteriores[0]?.pacienteNumero || "";
 
         if (!pacienteTipo || !pacienteNumero) {
-          alert("Error: no se pudo obtener el paciente.");
+          toast.error("Error: no se pudo obtener el paciente.");
           return;
         }
 
         await cerrarCasoIntervenciones(pacienteTipo, pacienteNumero);
 
-        alert("✅ Caso cerrado correctamente.");
+        toast.success("Caso cerrado correctamente.");
 
-        // 3️⃣ Limpiar y refrescar
         setText("");
         onClose();
         onRefresh();
 
       } catch (err) {
-        alert("❌ Error al cerrar el caso.");
+        toast.error("Error al cerrar el caso.");
       }
     }
   };
