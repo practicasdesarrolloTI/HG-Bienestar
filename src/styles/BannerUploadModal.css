@@ -1,0 +1,102 @@
+/* Modal general */
+.banner-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-height: 90%;
+    overflow-y: auto;
+    background-color: var(--white);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 32px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* Botón de seleccionar imagen */
+.banner-upload-button {
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
+    background-color: var(--primary) !important; 
+    color: var(--white) !important;
+}
+
+/* Vista previa de imagen */
+.banner-preview {
+    margin-bottom: 16px !important;
+}
+
+.banner-preview img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+}
+
+/* Botón de subir banner */
+.banner-submit-button {
+    background-color: var(--primary) !important;
+    color: var(--white) !important;
+    width: 100% !important;
+}
+
+/* Tabla */
+.banner-table-header {
+    background-color: var(--primary) !important;
+}
+
+.banner-table-header .MuiTableCell-head {
+    color: var(--white) !important;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+/* Fila hover */
+.banner-table-row:hover {
+    background-color: var(--light-gray);
+}
+
+/* Celdas */
+.banner-table-cell {
+    font-size: 14px;
+    padding: 12px 16px;
+}
+
+/* Avatar de la imagen */
+.banner-avatar {
+    width: 200px;
+    height: 100px;
+}
+
+/* Chip de estado */
+.banner-chip-habilitado {
+    background-color: var(--success) !important;
+}
+
+.banner-chip-deshabilitado {
+    background-color: var(--default) !important;
+}
+
+/* Botón de cambiar imagen */
+.banner-edit-image-button {
+    margin-right: 8px;
+}
+
+/* Botón de guardar */
+.banner-save-button {
+    margin-right: 8px;
+}
+
+/* Diálogo de confirmación */
+.banner-dialog-title {
+    font-weight: bold !important;
+}
+
+.banner-dialog-content {
+    font-size: 16px !important;
+}
+
+.banner-dialog-actions button {
+    min-width: 100px !important;
+}

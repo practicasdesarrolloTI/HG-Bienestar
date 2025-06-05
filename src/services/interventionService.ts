@@ -36,7 +36,11 @@ export const getIntervenciones = async (): Promise<Intervencion[]> => {
   return response.data;
 };
 
-export const cerrarIntervencion = async (id: string) => {
-  const response = await axios.put(`${API_URL}/Close/${id}`);
+export const cerrarCasoIntervenciones = async (pacienteTipo: string, pacienteNumero: string) => {
+  const response = await axios.put(`${API_URL}/Close`, {
+    pacienteTipo,
+    pacienteNumero
+  });
   return response.data;
 };
+

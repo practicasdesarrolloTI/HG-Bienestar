@@ -2,7 +2,8 @@ import React from "react";
 import "../styles/InterventionModal.css";
 import { Intervencion } from "../types/Intervenciones.type";
 import { format, parseISO } from "date-fns";
-import { cerrarIntervencion } from "../services/interventionService";
+import { cerrarCasoIntervenciones } from "../services/interventionService";
+import { toast } from "react-toastify";
 
 interface InterventionModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ const InterventionModal: React.FC<InterventionModalProps> = ({
 
   const handleSave = async () => {
     if (!text.trim()) {
-      alert("Por favor ingrese el detalle de la intervención.");
+      toast.error("Por favor ingrese el detalle de la intervención.");
       return;
     }
     onSave(text);
@@ -38,22 +39,41 @@ const InterventionModal: React.FC<InterventionModalProps> = ({
   if (!isOpen) return null;
 
   const handleCerrarIntervencion = async () => {
-    const ultimaInterv = intervencionesAnteriores[intervencionesAnteriores.length - 1];
-    if (!ultimaInterv) return;
+    if (intervencionesAnteriores.length === 0 && !text.trim()) {
+      toast.error("Debe ingresar al menos una intervención para cerrar el caso.");
+      return;
+    }
 
-    if (window.confirm("¿Estás seguro de cerrar esta intervención?")) {
+    if (window.confirm("¿Estás seguro de cerrar este caso? Esto cerrará TODAS las intervenciones de este paciente.")) {
       try {
-        await cerrarIntervencion(ultimaInterv.id);
-        alert("✅ Intervención cerrada");
-        onSave(text);
+        // 1️⃣ Guardar la intervención actual (si hay texto)
+        if (text.trim()) {
+          onSave(text);
+        }
+
+        // 2️⃣ Cerrar TODAS las intervenciones de este paciente
+        const pacienteTipo = intervencionesAnteriores[0]?.pacienteTipo || ""; // o del selectedPatient
+        const pacienteNumero = intervencionesAnteriores[0]?.pacienteNumero || "";
+
+        if (!pacienteTipo || !pacienteNumero) {
+          toast.error("Error: no se pudo obtener el paciente.");
+          return;
+        }
+
+        await cerrarCasoIntervenciones(pacienteTipo, pacienteNumero);
+
+        toast.success("Caso cerrado correctamente.");
+
         setText("");
         onClose();
         onRefresh();
+
       } catch (err) {
-        alert("❌ Error al cerrar intervención");
+        toast.error("Error al cerrar el caso.");
       }
     }
   };
+
 
   const ultimaCerrada = intervencionesAnteriores.some(i => i.cerrada);
 
