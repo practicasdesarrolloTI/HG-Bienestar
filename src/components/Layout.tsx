@@ -27,6 +27,10 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
 
+  const getRolNombre = (rol: string) => {
+    return rol === "admin" ? "Administrador" : "Usuario";
+};
+
   /** Construye la lista de navegación, ocultando maestros si el rol no es admin */
   const navItems: NavItem[] = [
     {
@@ -113,7 +117,7 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
                 <UserIcon size={16} />
               </div>
               <div className="user-info">
-                <p className="user-name">Admin</p>
+                <p className="user-name">{getRolNombre(userRole)}</p>
                 <p className="user-email">admin@eps.com</p>
               </div>
             </div>

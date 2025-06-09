@@ -168,6 +168,25 @@ const SurveyTable: React.FC = () => {
     necesitaIntervencion(row)
   );
 
+  const pacientesQueRequierenIntervencionPendiente = datosAgrupados.filter(row => {
+    if (!necesitaIntervencion(row)) {
+      return false; // no requiere → no lo contamos
+    }
+  
+    // sí requiere → miramos si ya está cerrada
+    const intervencionesPaciente = intervenciones.filter(interv =>
+      interv.pacienteTipo === row.tipoIdentificacion &&
+      interv.pacienteNumero === row.identificacion &&
+      interv.fechaEncuesta === row.fecha
+    );
+  
+    const estaCerrada = intervencionesPaciente.some(interv => interv.cerrada);
+  
+    // Solo contamos si NO está cerrada
+    return !estaCerrada;
+  });
+  
+
   // Pacientes que ya tienen intervención (cruce con intervenciones)
   const pacientesConIntervencion = pacientesQueRequierenIntervencion.filter(
     (row) =>
@@ -509,7 +528,7 @@ const SurveyTable: React.FC = () => {
               <p className="card-label">Pendientes por intervención</p>
               <p className="card-value">
                 {" "}
-                {pacientesQueRequierenIntervencion.length}
+                {pacientesQueRequierenIntervencionPendiente.length}
               </p>
             </div>
             <div className="icon-container red">
