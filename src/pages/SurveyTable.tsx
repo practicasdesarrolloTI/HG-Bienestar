@@ -160,6 +160,26 @@ const SurveyTable: React.FC = () => {
     necesitaIntervencion(row)
   );
 
+
+  const pacientesQueRequierenIntervencionPendiente = datosAgrupados.filter(row => {
+    if (!necesitaIntervencion(row)) {
+      return false; // no requiere → no lo contamos
+    }
+
+    // sí requiere → miramos si ya está cerrada
+    const intervencionesPaciente = intervenciones.filter(interv =>
+      interv.pacienteTipo === row.tipoIdentificacion &&
+      interv.pacienteNumero === row.identificacion &&
+      interv.fechaEncuesta === row.fecha
+    );
+
+    const estaCerrada = intervencionesPaciente.some(interv => interv.cerrada);
+
+    // Solo contamos si NO está cerrada
+    return !estaCerrada;
+  });
+
+
   // Pacientes que ya tienen intervención (cruce con intervenciones)
   const pacientesConIntervencion = pacientesQueRequierenIntervencion.filter(row =>
     intervenciones.some(interv =>
@@ -168,8 +188,6 @@ const SurveyTable: React.FC = () => {
       interv.fechaEncuesta === row.fecha
     )
   );
-
-  const pacientesSinIntervencion = pacientesQueRequierenIntervencion.length - pacientesConIntervencion.length;
 
   const intervencionesRealizadas = pacientesConIntervencion.length;
 
@@ -413,10 +431,7 @@ const SurveyTable: React.FC = () => {
           <strong>Encuestas completadas:</strong> {totalEncuestasCompletadas}
         </div>
         <div className="counter-card" style={{ background: "#FF5F3F", color: "#fff", padding: "1rem", borderRadius: "8px" }}>
-          <strong>Pacientes que requieren intervención:</strong> {pacientesQueRequierenIntervencion.length}
-        </div>
-        <div className="counter-card" style={{ background: "#FFB5A6", color: "#000", padding: "1rem", borderRadius: "8px" }}>
-          <strong>Pacientes sin intervención:</strong> {pacientesSinIntervencion}
+          <strong>Pacientes que requieren intervención:</strong> {pacientesQueRequierenIntervencionPendiente.length}
         </div>
         <div className="counter-card" style={{ background: "#45E3C9", color: "#000", padding: "1rem", borderRadius: "8px" }}>
           <strong>Intervenciones realizadas:</strong> {intervencionesRealizadas}
