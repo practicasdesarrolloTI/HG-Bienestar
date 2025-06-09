@@ -168,25 +168,24 @@ const SurveyTable: React.FC = () => {
     necesitaIntervencion(row)
   );
 
-
   const pacientesQueRequierenIntervencionPendiente = datosAgrupados.filter(row => {
     if (!necesitaIntervencion(row)) {
       return false; // no requiere → no lo contamos
     }
-
+  
     // sí requiere → miramos si ya está cerrada
     const intervencionesPaciente = intervenciones.filter(interv =>
       interv.pacienteTipo === row.tipoIdentificacion &&
       interv.pacienteNumero === row.identificacion &&
       interv.fechaEncuesta === row.fecha
     );
-
+  
     const estaCerrada = intervencionesPaciente.some(interv => interv.cerrada);
-
+  
     // Solo contamos si NO está cerrada
     return !estaCerrada;
   });
-
+  
 
   // Pacientes que ya tienen intervención (cruce con intervenciones)
   const pacientesConIntervencion = pacientesQueRequierenIntervencion.filter(
@@ -483,159 +482,7 @@ const SurveyTable: React.FC = () => {
           <h2> Encuestas de Pacientes</h2>
           <p>Gestión y seguimiento de encuestas de salud</p>
         </div>
-<<<<<<< HEAD
-        <div className="counter-card" style={{ background: "#80006A", color: "#fff", padding: "1rem", borderRadius: "8px" }}>
-          <strong>Encuestas completadas:</strong> {totalEncuestasCompletadas}
-        </div>
-        <div className="counter-card" style={{ background: "#FF5F3F", color: "#fff", padding: "1rem", borderRadius: "8px" }}>
-          <strong>Pacientes que requieren intervención:</strong> {pacientesQueRequierenIntervencionPendiente.length}
-        </div>
-        <div className="counter-card" style={{ background: "#45E3C9", color: "#000", padding: "1rem", borderRadius: "8px" }}>
-          <strong>Intervenciones realizadas:</strong> {intervencionesRealizadas}
-        </div>
-      </div>
-
-      <div className="info-container">
-        <div className="filters-card">
-          <div className="filter-row">
-            <label>
-              Tipo de documento:
-              <select
-                value={tipoFiltro}
-                onChange={(e) => setTipoFiltro(e.target.value)}
-              >
-                <option value="">Todos</option>
-                <option value="CC">CC</option>
-                <option value="TI">TI</option>
-                <option value="CE">CE</option>
-              </select>
-            </label>
-
-            <label>
-              Encuesta:
-              <select
-                value={escalaSeleccionada}
-                onChange={(e) => {
-                  setEscalaSeleccionada(e.target.value);
-                  setFindriscFiltro("");
-                  setFraminghamFiltro("");
-                  setLawtonFiltro("");
-                }}
-              >
-                <option value="">Todas</option>
-                <option value="findrisc">FINDRISC</option>
-                <option value="framingham">Framingham</option>
-                <option value="lawton">Lawton-Brody</option>
-                <option value="moriskyGreen">Morisky-Green</option>
-              </select>
-            </label>
-
-            {escalaSeleccionada === "findrisc" && (
-              <label>
-                Riesgo FINDRISC:
-                <select
-                  value={findriscFiltro}
-                  onChange={(e) => setFindriscFiltro(e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  <option value="Bajo">Bajo</option>
-                  <option value="Aumentado">Aumentado</option>
-                  <option value="Moderado">Moderado</option>
-                  <option value="Alto">Alto</option>
-                  <option value="Muy Alto">Muy Alto</option>
-                  <option value="Sin dato">Sin dato</option>
-                </select>
-              </label>
-            )}
-            {escalaSeleccionada === "framingham" && (
-              <label>
-                Riesgo Framingham:
-                <select
-                  value={framinghamFiltro}
-                  onChange={(e) => setFraminghamFiltro(e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  <option value="Bajo">Bajo</option>
-                  <option value="Moderado">Moderado</option>
-                  <option value="Alto">Alto</option>
-                  <option value="Sin dato">Sin dato</option>
-                </select>
-              </label>
-            )}
-            {escalaSeleccionada === "lawton" && (
-              <label>
-                Riesgo Lawton:
-                <select
-                  value={lawtonFiltro}
-                  onChange={(e) => setLawtonFiltro(e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  <option value="Independiente">Independiente</option>
-                  <option value="Dependencia Leve">Dependencia Leve</option>
-                  <option value="Dependencia Moderada">
-                    Dependencia Moderada
-                  </option>
-                  <option value="Dependencia Total">Dependencia Total</option>
-                  <option value="Sin dato">Sin dato</option>
-                </select>
-              </label>
-            )}
-            {escalaSeleccionada === "moriskyGreen" && (
-              <label>
-                Indicador moriskyGreen:
-                <select
-                  value={moriskyGreenFiltro}
-                  onChange={(e) => setmoriskyGreenFiltro(e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  <option value="Bajo">Bajo</option>
-                  <option value="Alto">Alto</option>
-                  <option value="Sin dato">Sin dato</option>
-                </select>
-              </label>
-            )}
-
-
-            <label>
-              Fecha Inicial:
-              <DatePicker
-                selected={fechaInicio}
-                onChange={(date) => setFechaInicio(date)}
-                dateFormat="dd/MM/yyyy"
-                className="datepicker-input"
-              />
-            </label>
-
-            <label>
-              Fecha Final:
-              <DatePicker
-                selected={fechaFin}
-                onChange={(date) => setFechaFin(date)}
-                dateFormat="dd/MM/yyyy"
-                className="datepicker-input"
-              />
-            </label>
-
-            <label>
-              Intervención:
-              <select
-                value={intervencionFiltro}
-                onChange={(e) => setIntervencionFiltro(e.target.value)}
-              >
-                <option value="">Todos</option>
-                <option value="si">Sí</option>
-                <option value="no">No</option>
-              </select>
-            </label>
-          </div>
-        </div>
-
-        {/* Tabla */}
-
-        <div className="export-buttons">
-=======
         <div className="page-actions">
->>>>>>> 6e9541e8d9cb1f12c86f437ab23f0a75de976722
           <button
             onClick={exportToExcel}
             disabled={filteredData.length === 0}
@@ -681,7 +528,7 @@ const SurveyTable: React.FC = () => {
               <p className="card-label">Pendientes por intervención</p>
               <p className="card-value">
                 {" "}
-                {pacientesQueRequierenIntervencion.length}
+                {pacientesQueRequierenIntervencionPendiente.length}
               </p>
             </div>
             <div className="icon-container red">

@@ -8,7 +8,7 @@ import {
   UserIcon,
   LogOutIcon,
 } from "lucide-react";
-import logo from '../assets/logomecuidoconletra.png'
+import logo from '../assets/logomecuidoconletra.png' 
 import "../styles/Layout.css";
 
 interface LayoutProps {
@@ -48,13 +48,13 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
     // Solo mostramos “Maestros” si es admin
     ...(userRole === "admin"
       ? [
-        {
-          id: "maestros" as const,
-          label: "Maestros",
-          icon: SettingsIcon,
-          path: "/maestros",
-        },
-      ]
+          {
+            id: "maestros" as const,
+            label: "Maestros",
+            icon: SettingsIcon,
+            path: "/maestros",
+          },
+        ]
       : []),
   ];
 
@@ -69,7 +69,7 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
       <div
         className={`sidebar ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
       >
-
+        
         {/* Logo + Toggle */}
         <div className="logo-container">
           {sidebarOpen && (
@@ -93,10 +93,11 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
               <li key={item.id} className="nav-item">
                 <Link
                   to={item.path}
-                  className={`nav-button ${isActive(item.path)
+                  className={`nav-button ${
+                    isActive(item.path)
                       ? "nav-button-active"
                       : "nav-button-inactive"
-                    }`}
+                  }`}
                 >
                   <item.icon size={20} />
                   {sidebarOpen && (
@@ -143,19 +144,8 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
             <div className="header-buttons">
               {/* <button className="header-button" aria-label="Notifications">
                 <BellIcon size={20} />
-<<<<<<< HEAD
-              </button>
-              <button className="header-button" aria-label="Log out"
-                onClick={() => {
-                  localStorage.removeItem('token');
-                  localStorage.removeItem('user');
-                  localStorage.removeItem("auth");
-                  window.location.href = "/";
-                }}>
-=======
               </button> */}
               <button className="header-button" aria-label="Log out">
->>>>>>> 6e9541e8d9cb1f12c86f437ab23f0a75de976722
                 <LogOutIcon size={20} />
               </button>
             </div>
