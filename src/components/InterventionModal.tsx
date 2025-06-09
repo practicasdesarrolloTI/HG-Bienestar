@@ -68,7 +68,7 @@ const InterventionModal: React.FC<InterventionModalProps> = ({
         onClose();
         onRefresh();
 
-      } catch (err) {
+      } catch  {
         toast.error("Error al cerrar el caso.");
       }
     }

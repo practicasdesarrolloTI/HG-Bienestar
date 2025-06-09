@@ -151,13 +151,13 @@ const UserManagementModal: React.FC<Props> = ({ open, onClose }) => {
                         <MenuItem value="user">Usuario</MenuItem>
                         <MenuItem value="admin">Administrador</MenuItem>
                     </Select>
-                    <Button variant="contained" onClick={handleRegister} sx={{ backgroundColor: "var(--primary)", color: "var(--white)" }}>Crear</Button>
+                    <Button variant="contained" onClick={handleRegister} sx={{ backgroundColor: "var(--dark-blue)", color: "var(--white)" }}>Crear</Button>
                 </Box>
 
                 <Paper>
                     <Table>
                         <TableHead sx={{
-                            backgroundColor: "var(--primary)",
+                            backgroundColor: "var(--dark-blue)",
                             "& .MuiTableCell-head": {
                                 color: "var(--white)",
                                 fontWeight: "bold",

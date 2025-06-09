@@ -27,7 +27,7 @@ const MastersPage = () => {
                         variant="contained"
                         size="large"
                         onClick={() => setModalBannersAbierto(true)}
-                        sx={{backgroundColor: "var(--primary)", color:"var(--white)"}}
+                        sx={{backgroundColor: "var(--dark-blue)", color:"var(--white)"}}
                     >
                         Banners
                     </Button>
@@ -36,7 +36,7 @@ const MastersPage = () => {
                         variant="contained"
                         size="large"
                         onClick={() => setModalUsuariosAbierto(true)}
-                        sx={{backgroundColor: "var(--primary)", color:"var(--white)"}}
+                        sx={{backgroundColor: "var(--dark-blue)", color:"var(--white)"}}
                     >
                         Usuarios
                     </Button>
@@ -45,7 +45,7 @@ const MastersPage = () => {
                         variant="contained"
                         size="large"
                         onClick={() => setModalProgramasAbierto(true)}
-                        sx={{backgroundColor: "var(--primary)", color:"var(--white)"}}
+                        sx={{backgroundColor: "var(--dark-blue)", color:"var(--white)"}}
                     >
                         Programas
                     </Button>

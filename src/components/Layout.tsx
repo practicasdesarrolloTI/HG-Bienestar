@@ -6,7 +6,6 @@ import {
   SettingsIcon,
   MenuIcon,
   UserIcon,
-  BellIcon,
   LogOutIcon,
 } from "lucide-react";
 import logo from '../assets/logomecuidoconletra.png' 
@@ -139,9 +138,9 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
               {location.pathname.startsWith("/maestros") && "Maestros"}
             </h2>
             <div className="header-buttons">
-              <button className="header-button" aria-label="Notifications">
+              {/* <button className="header-button" aria-label="Notifications">
                 <BellIcon size={20} />
-              </button>
+              </button> */}
               <button className="header-button" aria-label="Log out">
                 <LogOutIcon size={20} />
               </button>

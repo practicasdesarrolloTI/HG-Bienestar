@@ -51,7 +51,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated, setUserRole})
           textAlign: "center"
         }}
       >
-        <Typography variant="h4" gutterBottom sx={{ color: "var(--primary)", fontWeight: "bold" }}>
+        <Typography variant="h4" gutterBottom sx={{ color: "var(--dark-blue)", fontWeight: "bold" }}>
           Iniciar Sesión
         </Typography>
 
@@ -89,7 +89,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated, setUserRole})
             variant="contained"
             sx={{
               mt: 3,
-              backgroundColor: "var(--primary)",
+              backgroundColor: "var(--dark-blue)",
               color: "var(--white)",
               fontWeight: "bold",
               textTransform: "uppercase",

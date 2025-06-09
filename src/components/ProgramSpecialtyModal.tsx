@@ -161,7 +161,7 @@ const ProgramSpecialtyModal: React.FC<Props> = ({ open, onClose }) => {
                             onChange={(e) => setSpecialtyInput(e.target.value)}
                             fullWidth
                         />
-                        <Button variant="contained" onClick={handleAddSpecialty} sx={{ backgroundColor: "var(--primary)", color: "var(--white)" }}>Agregar</Button>
+                        <Button variant="contained" onClick={handleAddSpecialty} sx={{ backgroundColor: "var(--dark-blue)", color: "var(--white)" }}>Agregar</Button>
                     </Box>
 
                     <Box mb={2}>
@@ -171,14 +171,14 @@ const ProgramSpecialtyModal: React.FC<Props> = ({ open, onClose }) => {
                         ))}
                     </Box>
 
-                    <Button variant="contained" color="primary" onClick={handleCreate} sx={{ backgroundColor: "var(--primary)", color: "var(--white)" }}>Crear Programa</Button>
+                    <Button variant="contained" color="primary" onClick={handleCreate} sx={{ backgroundColor: "var(--dark-blue)", color: "var(--white)" }}>Crear Programa</Button>
                 </Box>
 
                 {/* Tabla de programas */}
                 <Paper>
                     <Table>
                         <TableHead sx={{
-                            backgroundColor: "var(--primary)",
+                            backgroundColor: "var(--dark-blue)",
                             "& .MuiTableCell-head": {
                                 color: "var(--white)",
                                 fontWeight: "bold",
