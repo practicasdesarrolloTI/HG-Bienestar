@@ -537,40 +537,40 @@ const SurveyTable: React.FC = () => {
         <div className="survey-results-container">
           <div className="survey-header">
             <h2>Resultados de Encuestas</h2>
-           <div className="filters-container"> 
-            <input
-              type="text"
-              placeholder="Buscar por documento..."
-              value={busquedaDocumento}
-              onChange={(e) => setBusquedaDocumento(e.target.value)}
-              className="search-input"
-            />
-            <FiltersModal
-              show={showFilters}
-              onClose={() => setShowFilters(false)}
-              onApply={applyFilters}
-              onClearAll={clearAllFilters}
-              selectedTipos={selectedTipos}
-              setSelectedTipos={setSelectedTipos}
-              selectedFindriscCats={selectedFindriscCats}
-              setSelectedFindriscCats={setSelectedFindriscCats}
-              selectedFraminghamCats={selectedFraminghamCats}
-              setSelectedFraminghamCats={setSelectedFraminghamCats}
-              selectedLawtonCats={selectedLawtonCats}
-              setSelectedLawtonCats={setSelectedLawtonCats}
-              selectedMoriskyCats={selectedMoriskyCats}
-              setSelectedMoriskyCats={setSelectedMoriskyCats}
-              fechaInicio={fechaInicio}
-              setFechaInicio={setFechaInicio}
-              fechaFin={fechaFin}
-              setFechaFin={setFechaFin}
-              selectedIntervencion={selectedIntervencion}
-              setSelectedIntervencion={setSelectedIntervencion}
-            />
-            <button onClick={toggleFiltersModal} className="btn-icon">
-              <FunnelIcon size={16} />
-            </button>
-          </div>
+            <div className="filters-container">
+              <input
+                type="text"
+                placeholder="Buscar por documento..."
+                value={busquedaDocumento}
+                onChange={(e) => setBusquedaDocumento(e.target.value)}
+                className="search-input"
+              />
+              <FiltersModal
+                show={showFilters}
+                onClose={() => setShowFilters(false)}
+                onApply={applyFilters}
+                onClearAll={clearAllFilters}
+                selectedTipos={selectedTipos}
+                setSelectedTipos={setSelectedTipos}
+                selectedFindriscCats={selectedFindriscCats}
+                setSelectedFindriscCats={setSelectedFindriscCats}
+                selectedFraminghamCats={selectedFraminghamCats}
+                setSelectedFraminghamCats={setSelectedFraminghamCats}
+                selectedLawtonCats={selectedLawtonCats}
+                setSelectedLawtonCats={setSelectedLawtonCats}
+                selectedMoriskyCats={selectedMoriskyCats}
+                setSelectedMoriskyCats={setSelectedMoriskyCats}
+                fechaInicio={fechaInicio}
+                setFechaInicio={setFechaInicio}
+                fechaFin={fechaFin}
+                setFechaFin={setFechaFin}
+                selectedIntervencion={selectedIntervencion}
+                setSelectedIntervencion={setSelectedIntervencion}
+              />
+              <button onClick={toggleFiltersModal} className="btn-icon">
+                <FunnelIcon size={16} />
+              </button>
+            </div>
           </div>
           {filteredData.length > 0 ? (
             <div className="info-card">
@@ -599,6 +599,7 @@ const SurveyTable: React.FC = () => {
                           ? d.findrisc
                           : "-"}
                       </td>
+
                       <td className={getFraminghamColorClass(d.framingham)}>
                         {d.framingham !== null && d.framingham !== undefined
                           ? d.framingham
@@ -770,53 +771,51 @@ const SurveyTable: React.FC = () => {
                   ))}
                 </tbody>
               </table>
-
-             
             </div>
           ) : (
             <EmptyMessage message="No se encontraron datos en tu búsqueda." />
           )}
         </div>
-         {ultimaActualizacion && (
-                <p
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#888",
-                    marginBottom: "8px",
-                    textAlign: "right",
-                  }}
-                >
-                  Última actualización:{" "}
-                  {format(ultimaActualizacion, "dd/MM/yyyy HH:mm:ss")}
-                </p>
-              )}
+        {ultimaActualizacion && (
+          <p
+            style={{
+              fontSize: "0.85rem",
+              color: "#888",
+              marginBottom: "8px",
+              textAlign: "right",
+            }}
+          >
+            Última actualización:{" "}
+            {format(ultimaActualizacion, "dd/MM/yyyy HH:mm:ss")}
+          </p>
+        )}
 
-              {/* Paginador */}
-              <div className="pagination">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  « Anterior
-                </button>
+        {/* Paginador */}
+        <div className="pagination">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            « Anterior
+          </button>
 
-                {Array.from({ length: totalPages }, (_, index) => (
-                  <button
-                    key={index + 1}
-                    className={currentPage === index + 1 ? "active" : ""}
-                    onClick={() => handlePageChange(index + 1)}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              className={currentPage === index + 1 ? "active" : ""}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))}
 
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  Siguiente »
-                </button>
-              </div>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente »
+          </button>
+        </div>
       </div>
     </div>
   );
