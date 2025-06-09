@@ -6,7 +6,6 @@ import {
   SettingsIcon,
   MenuIcon,
   UserIcon,
-  BellIcon,
   LogOutIcon,
 } from "lucide-react";
 import logo from '../assets/logomecuidoconletra.png'
@@ -142,8 +141,9 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
               {location.pathname.startsWith("/maestros") && "Maestros"}
             </h2>
             <div className="header-buttons">
-              <button className="header-button" aria-label="Notifications">
+              {/* <button className="header-button" aria-label="Notifications">
                 <BellIcon size={20} />
+<<<<<<< HEAD
               </button>
               <button className="header-button" aria-label="Log out"
                 onClick={() => {
@@ -152,6 +152,10 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
                   localStorage.removeItem("auth");
                   window.location.href = "/";
                 }}>
+=======
+              </button> */}
+              <button className="header-button" aria-label="Log out">
+>>>>>>> 6e9541e8d9cb1f12c86f437ab23f0a75de976722
                 <LogOutIcon size={20} />
               </button>
             </div>

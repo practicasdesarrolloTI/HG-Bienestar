@@ -20,3 +20,4 @@ export type Agrupado = {
   lawtonBrody: number | null;
   moriskyGreen?: number | null;
 };
+
