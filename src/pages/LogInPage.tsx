@@ -10,12 +10,19 @@ import {
   Paper
 } from "@mui/material";
 
+type UserType = {
+  username: string;
+  mail: string;
+  role: string;
+  userId: string;
+};
+
 interface LoginPageProps {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  setUserRole: React.Dispatch<React.SetStateAction<string | null>>;
+  setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated, setUserRole}) => {
+const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated, setUser}) => {
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -27,7 +34,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated, setUserRole})
       const userString = localStorage.getItem("user");
       const userObj = userString ? JSON.parse(userString) : null;
       setIsAuthenticated(true);
-      setUserRole(userObj?.role);
+      setUser(userObj);
     } catch (error: any) {
       console.error(error);
       setMensaje(error.response?.data?.message || "Error en el login");

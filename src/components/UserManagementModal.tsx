@@ -96,7 +96,7 @@ const UserManagementModal: React.FC<Props> = ({ open, onClose }) => {
     try {
       const token = getToken();
       await axios.put(
-        `http://localhost:8001/api/auth/${id}`,
+        `http://18.207.0.161:3001/api/auth/${id}`,
         {
           password: nuevoPassword,
           role: nuevoRol,
@@ -115,7 +115,7 @@ const UserManagementModal: React.FC<Props> = ({ open, onClose }) => {
 
   const handleDelete = async (id: string) => {
     const token = getToken();
-    await axios.delete(`http://localhost:8001/api/auth/${id}`, {
+    await axios.delete(`http://18.207.0.161:3001/api/auth/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     loadUsers();

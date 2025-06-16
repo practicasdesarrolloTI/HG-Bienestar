@@ -7,13 +7,20 @@ import {
   UserIcon,
   LogOutIcon,
 } from "lucide-react";
-import logo from '../assets/logomecuidoconletra.png' 
+import logo from '../assets/logomecuidoconletra.png'
 import "../styles/Layout.css";
 
 interface LayoutProps {
-  userRole: string;
+  user: UserType;
   children: React.ReactNode;
 }
+
+type UserType = {
+  username: string;
+  userId: string;
+  mail: string;
+  role: string;
+};
 
 type NavItem = {
   id: "encuestas" | "medicamentos" | "maestros";
@@ -22,13 +29,13 @@ type NavItem = {
   path: string;
 };
 
-export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
+export const Layout: React.FC<LayoutProps> = ({ user, children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
 
   const getRolNombre = (rol: string) => {
     return rol === "admin" ? "Administrador" : "Usuario";
-};
+  };
 
   /** Construye la lista de navegación, ocultando maestros si el rol no es admin */
   const navItems: NavItem[] = [
@@ -46,15 +53,15 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
     //   path: "/medicamentos",
     // },
     // Solo mostramos “Maestros” si es admin
-    ...(userRole === "admin"
+    ...(user.role === "admin"
       ? [
-          {
-            id: "maestros" as const,
-            label: "Maestros",
-            icon: SettingsIcon,
-            path: "/maestros",
-          },
-        ]
+        {
+          id: "maestros" as const,
+          label: "Maestros",
+          icon: SettingsIcon,
+          path: "/maestros",
+        },
+      ]
       : []),
   ];
 
@@ -69,7 +76,7 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
       <div
         className={`sidebar ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
       >
-        
+
         {/* Logo + Toggle */}
         <div className="logo-container">
           {sidebarOpen && (
@@ -93,11 +100,10 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
               <li key={item.id} className="nav-item">
                 <Link
                   to={item.path}
-                  className={`nav-button ${
-                    isActive(item.path)
-                      ? "nav-button-active"
-                      : "nav-button-inactive"
-                  }`}
+                  className={`nav-button ${isActive(item.path)
+                    ? "nav-button-active"
+                    : "nav-button-inactive"
+                    }`}
                 >
                   <item.icon size={20} />
                   {sidebarOpen && (
@@ -117,8 +123,8 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
                 <UserIcon size={16} />
               </div>
               <div className="user-info">
-                <p className="user-name">{getRolNombre(userRole)}</p>
-                <p className="user-email">admin@eps.com</p>
+                <p className="user-name">{getRolNombre(user.role)}</p>
+                <p className="user-email">{user.mail}</p>
               </div>
             </div>
           ) : (
@@ -145,7 +151,15 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
               {/* <button className="header-button" aria-label="Notifications">
                 <BellIcon size={20} />
               </button> */}
-              <button className="header-button" aria-label="Log out">
+              <button
+                className="header-button"
+                aria-label="Log out"
+                onClick={() => {
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('user');
+                  localStorage.removeItem("auth");
+                  window.location.href = "/";
+                }}>
                 <LogOutIcon size={20} />
               </button>
             </div>

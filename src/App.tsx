@@ -7,20 +7,33 @@ import SurveyTable from "./pages/SurveyTable"
 import MedicationsTable from "./pages/MedicationsTable"
 import MastersPage from "./pages/MastersPage"
 
+type UserType = {
+  username: string;
+  mail: string;
+  role: string;
+  userId: string;
+  // Puedes agregar más campos aquí si tu objeto usuario los tiene
+};  
+
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem("auth") === "true"
   })
 
-  const [userRole, setUserRole] = useState<string | null>(() => {
-    const userStr = localStorage.getItem("user")
-    if (userStr) {
-      const user = JSON.parse(userStr)
-      return user.role || null
-    }
-    return null
-  })
+  const [user, setUser] = useState<UserType | null>(() => {
+    const userStr = localStorage.getItem("user");
+    return userStr ? JSON.parse(userStr) : null;
+  });
+
+  // const [userRole, setUserRole] = useState<string | null>(() => {
+  //   const userStr = localStorage.getItem("user")
+  //   if (userStr) {
+  //     const user = JSON.parse(userStr)
+  //     return user.role || null
+  //   }
+  //   return null
+  // })
 
   // Guardar el estado en localStorage
   useEffect(() => {
@@ -36,7 +49,7 @@ const App: React.FC = () => {
             isAuthenticated ? (
               <Navigate to="/encuestas" replace />
             ) : (
-              <LoginPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />
+              <LoginPage setIsAuthenticated={setIsAuthenticated} setUser={setUser} />
             )
           }
         />
@@ -44,8 +57,8 @@ const App: React.FC = () => {
         <Route
           path="/encuestas"
           element={
-            isAuthenticated ? (
-              <Layout userRole={userRole ?? ""}>
+            isAuthenticated && user ? (
+              <Layout user={user}>
                 <SurveyTable />
               </Layout>
             ) : (
@@ -57,8 +70,8 @@ const App: React.FC = () => {
         <Route
           path="/medicamentos"
           element={
-            isAuthenticated ? (
-              <Layout userRole={userRole ?? ""}>
+            isAuthenticated && user ? (
+              <Layout user={user}>
                 <MedicationsTable />
               </Layout>
             ) : (
@@ -70,8 +83,8 @@ const App: React.FC = () => {
         <Route
           path="/maestros"
           element={
-            isAuthenticated && userRole === "admin" ? (
-              <Layout userRole={userRole ?? ""}>
+            isAuthenticated && user?.role === "admin" ? (
+              <Layout user={user}>
                 <MastersPage />
               </Layout>
             ) : (

@@ -11,59 +11,59 @@ const MastersPage = () => {
   const [modalProgramasAbierto, setModalProgramasAbierto] = useState(false);
 
   return (
-  
-      <Box >
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h4" gutterBottom>
-            Maestros
-          </Typography>
 
-          <text aria-atomic>
-            Control de Usuarios HG y Componentes de la Aplicación Movil CuidarMe
-          </text>
+    <Box >
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Maestros
+        </Typography>
 
-          <Divider sx={{ mb: 3, mt:3 }} />
+        <text aria-atomic>
+          Gestión de módulos de la aplicación CuidarMe
+        </text>
 
-          <div className="button-container">
-            <button
-              onClick={() => setModalBannersAbierto(true)}
-              className="btn btn-outline"
-            >
-              Banners
-            </button>
+        <Divider sx={{ mb: 3, mt: 3 }} />
 
-            <button
-              onClick={() => setModalUsuariosAbierto(true)}
-              className="btn btn-outline"
-            >
-              Usuarios
-            </button>
+        <div className="button-container">
+          <button
+            onClick={() => setModalBannersAbierto(true)}
+            className="btn btn-outline"
+          >
+            Banners
+          </button>
 
-            <button
-              onClick={() => setModalProgramasAbierto(true)}
-              className="btn btn-outline"
-            >
-              Programas
-            </button>
-          </div>
+          <button
+            onClick={() => setModalUsuariosAbierto(true)}
+            className="btn btn-outline"
+          >
+            Usuarios
+          </button>
 
-          {/* Modals */}
-          <BannerUploadModal
-            open={modalBannersAbierto}
-            onClose={() => setModalBannersAbierto(false)}
-          />
+          <button
+            onClick={() => setModalProgramasAbierto(true)}
+            className="btn btn-outline"
+          >
+            Programas
+          </button>
+        </div>
 
-          <UserManagementModal
-            open={modalUsuariosAbierto}
-            onClose={() => setModalUsuariosAbierto(false)}
-          />
+        {/* Modals */}
+        <BannerUploadModal
+          open={modalBannersAbierto}
+          onClose={() => setModalBannersAbierto(false)}
+        />
 
-          <ProgramSpecialtyModal
-            open={modalProgramasAbierto}
-            onClose={() => setModalProgramasAbierto(false)}
-          />
-        </Paper>
-      </Box>
+        <UserManagementModal
+          open={modalUsuariosAbierto}
+          onClose={() => setModalUsuariosAbierto(false)}
+        />
+
+        <ProgramSpecialtyModal
+          open={modalProgramasAbierto}
+          onClose={() => setModalProgramasAbierto(false)}
+        />
+      </Paper>
+    </Box>
   );
 };
 

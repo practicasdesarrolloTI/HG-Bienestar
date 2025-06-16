@@ -17,6 +17,7 @@ export const registerUser = async (username: string, mail: string, password: str
 interface LoginResponse {
   token: string;
   username: string;
+  mail: string;
   userId: string;
   role: string;
 }
@@ -28,6 +29,7 @@ export const loginUser = async (username: string, password: string) => {
   localStorage.setItem('token', response.data.token);
   localStorage.setItem('user', JSON.stringify({
     username: response.data.username,
+    mail: response.data.mail,
     userId: response.data.userId,
     role: response.data.role
   }));
