@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   ClipboardListIcon,
-  PillIcon,
   SettingsIcon,
   MenuIcon,
   UserIcon,
@@ -39,12 +38,13 @@ export const Layout: React.FC<LayoutProps> = ({ userRole, children }) => {
       icon: ClipboardListIcon,
       path: "/encuestas",
     },
-    {
-      id: "medicamentos",
-      label: "Medicamentos",
-      icon: PillIcon,
-      path: "/medicamentos",
-    },
+    // Esta sección es para una segunda fase del proyecto, donde se agregarán medicamentos
+    // {
+    //   id: "medicamentos",
+    //   label: "Medicamentos",
+    //   icon: PillIcon,
+    //   path: "/medicamentos",
+    // },
     // Solo mostramos “Maestros” si es admin
     ...(userRole === "admin"
       ? [

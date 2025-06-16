@@ -168,24 +168,28 @@ const SurveyTable: React.FC = () => {
     necesitaIntervencion(row)
   );
 
-  const pacientesQueRequierenIntervencionPendiente = datosAgrupados.filter(row => {
-    if (!necesitaIntervencion(row)) {
-      return false; // no requiere → no lo contamos
+  const pacientesQueRequierenIntervencionPendiente = datosAgrupados.filter(
+    (row) => {
+      if (!necesitaIntervencion(row)) {
+        return false; // no requiere → no lo contamos
+      }
+
+      // sí requiere → miramos si ya está cerrada
+      const intervencionesPaciente = intervenciones.filter(
+        (interv) =>
+          interv.pacienteTipo === row.tipoIdentificacion &&
+          interv.pacienteNumero === row.identificacion &&
+          interv.fechaEncuesta === row.fecha
+      );
+
+      const estaCerrada = intervencionesPaciente.some(
+        (interv) => interv.cerrada
+      );
+
+      // Solo contamos si NO está cerrada
+      return !estaCerrada;
     }
-  
-    // sí requiere → miramos si ya está cerrada
-    const intervencionesPaciente = intervenciones.filter(interv =>
-      interv.pacienteTipo === row.tipoIdentificacion &&
-      interv.pacienteNumero === row.identificacion &&
-      interv.fechaEncuesta === row.fecha
-    );
-  
-    const estaCerrada = intervencionesPaciente.some(interv => interv.cerrada);
-  
-    // Solo contamos si NO está cerrada
-    return !estaCerrada;
-  });
-  
+  );
 
   // Pacientes que ya tienen intervención (cruce con intervenciones)
   const pacientesConIntervencion = pacientesQueRequierenIntervencion.filter(
@@ -564,7 +568,13 @@ const SurveyTable: React.FC = () => {
                 onChange={(e) => setBusquedaDocumento(e.target.value)}
                 className="search-input"
               />
-              <FiltersModal
+
+              <button onClick={toggleFiltersModal} className="btn-icon">
+                <FunnelIcon size={16} />
+              </button>
+            </div>
+          </div>
+                       <FiltersModal
                 show={showFilters}
                 onClose={() => setShowFilters(false)}
                 onApply={applyFilters}
@@ -585,211 +595,254 @@ const SurveyTable: React.FC = () => {
                 setFechaFin={setFechaFin}
                 selectedIntervencion={selectedIntervencion}
                 setSelectedIntervencion={setSelectedIntervencion}
-              />
-              <button onClick={toggleFiltersModal} className="btn-icon">
-                <FunnelIcon size={16} />
-              </button>
-            </div>
-          </div>
+              /> 
           {filteredData.length > 0 ? (
             <div className="info-card">
-              <table className="survey-table">
-                <thead>
-                  <tr>
-                    <th>Tipo de documento</th>
-                    <th>Documento</th>
-                    <th>Nombre</th>
-                    <th>FINDRISC</th>
-                    <th>Framingham</th>
-                    <th>Lawton-Brody</th>
-                    <th>Morisky-Green</th>
-                    <th>Fecha</th>
-                    <th>Intervención</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((d, i) => (
-                    <tr key={i}>
-                      <td>{d.tipoIdentificacion}</td>
-                      <td>{d.identificacion}</td>
-                      <td>{d.nombre}</td>
-                      <td className={getFindriscColorClass(d.findrisc)}>
-                        {d.findrisc !== null && d.findrisc !== undefined
-                          ? d.findrisc
-                          : "-"}
-                      </td>
-
-                      <td className={getFraminghamColorClass(d.framingham)}>
-                        {d.framingham !== null && d.framingham !== undefined
-                          ? d.framingham
-                          : "-"}
-                      </td>
-
-                      <td className={getLawtonColorClass(d.lawtonBrody)}>
-                        {d.lawtonBrody !== null && d.lawtonBrody !== undefined
-                          ? d.lawtonBrody
-                          : "-"}
-                      </td>
-
-                      <td
-                        className={getMoriskyGreenColorClass(
-                          d.moriskyGreen ?? null
-                        )}
-                      >
-                        {d.moriskyGreen !== null && d.moriskyGreen !== undefined
-                          ? d.moriskyGreen
-                          : "-"}
-                      </td>
-
-                      <td>{format(parseISO(d.fecha), "dd/MM/yyyy")}</td>
-                      <td
-                        style={{
-                          fontWeight: "bold",
-                          textAlign: "center",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "6px",
-                        }}
-                      >
-                        {(() => {
-                          const necesita = necesitaIntervencion(d);
-
-                          const intervencionesPaciente = intervenciones.filter(
-                            (interv) =>
-                              interv.pacienteTipo === d.tipoIdentificacion &&
-                              interv.pacienteNumero === d.identificacion &&
-                              interv.fechaEncuesta === d.fecha
-                          );
-
-                          const estaCerrada = intervencionesPaciente.some(
-                            (interv) => interv.cerrada
-                          );
-
-                          if (!necesita) {
-                            // No requiere intervención
-                            return (
-                              <>
-                                <XCircleIcon
-                                  style={{
-                                    color: "#9E9E9E",
-                                    fontSize: "0.95rem",
-                                  }}
-                                  aria-label="No requerida"
-                                />
-                                <span
-                                  style={{
-                                    color: "#666",
-                                    fontSize: "0.95rem",
-                                  }}
-                                >
-                                  No requerida
-                                </span>
-                              </>
-                            );
-                          } else if (estaCerrada) {
-                            // Ya completada
-                            return (
-                              <>
-                                <CheckCircleIcon
-                                  style={{
-                                    color: "#00C853",
-                                    fontSize: "0.95rem",
-                                  }}
-                                  aria-label="Completada"
-                                />
-                                <span
-                                  style={{
-                                    color: "#666",
-                                    fontSize: "0.95rem",
-                                  }}
-                                >
-                                  Completada
-                                </span>
-                              </>
-                            );
-                          } else {
-                            // Pendiente (botón de intervención)
-                            return (
-                              <>
-                                <button
-                                  onClick={() => {
-                                    setSelectedPatient({
-                                      _id: "",
-                                      tipoIdentificacion: d.tipoIdentificacion,
-                                      identificacion: d.identificacion,
-                                      nombre: d.nombre,
-                                      findrisc: d.findrisc,
-                                      framingham: d.framingham,
-                                      lawtonBrody: d.lawtonBrody,
-                                      fecha: d.fecha,
-                                    });
-                                    setInterventionText("");
-                                    setIsModalOpen(true);
-                                  }}
-                                  style={{
-                                    background: "transparent",
-                                    border: "none",
-                                    cursor: "pointer",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "6px",
-                                  }}
-                                  title="Registrar intervención"
-                                >
-                                  <AlertCircleIcon
-                                    style={{
-                                      color: "#FF0000",
-                                      fontSize: "0.95rem",
-                                    }}
-                                  />
-                                  <span
-                                    style={{
-                                      color: "#FF0000",
-                                      fontSize: "0.95rem",
-                                    }}
-                                  >
-                                    Pendiente
-                                  </span>
-                                </button>
-
-                                <InterventionModal
-                                  key={
-                                    selectedPatient
-                                      ? `${selectedPatient.tipoIdentificacion}-${selectedPatient.identificacion}-${selectedPatient.fecha}`
-                                      : "empty"
-                                  }
-                                  isOpen={isModalOpen}
-                                  onClose={() => {
-                                    setIsModalOpen(false);
-                                    setInterventionText("");
-                                    setSelectedPatient(null);
-                                  }}
-                                  onSave={handleRegistrarIntervencion}
-                                  intervencionesAnteriores={
-                                    selectedPatient
-                                      ? intervenciones.filter(
-                                          (interv) =>
-                                            interv.pacienteTipo ===
-                                              selectedPatient.tipoIdentificacion &&
-                                            interv.pacienteNumero ===
-                                              selectedPatient.identificacion
-                                        )
-                                      : []
-                                  }
-                                  onRefresh={cargarDatos}
-                                  text={interventionText}
-                                  setText={setInterventionText}
-                                />
-                              </>
-                            );
-                          }
-                        })()}
-                      </td>
+              
+              <div className="table-responsive">
+                <table className="survey-table">
+                  <thead>
+                    <tr>
+                      <th>Tipo de documento</th>
+                      <th>Documento</th>
+                      <th>Nombre</th>
+                      <th>FINDRISC</th>
+                      <th>Framingham</th>
+                      <th>Lawton-Brody</th>
+                      <th>Morisky-Green</th>
+                      <th>Fecha</th>
+                      <th>Intervención</th>
                     </tr>
+                  </thead>
+                  <tbody>
+                    {currentItems.map((d, i) => (
+                      <tr key={i}>
+                        <td>{d.tipoIdentificacion}</td>
+                        <td>{d.identificacion}</td>
+                        <td>
+                          {d.nombre
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase()
+                            )
+                            .join(" ")}
+                        </td>
+                        <td>
+                          <span
+                            className={`score-circle ${getFindriscColorClass(
+                              d.findrisc
+                            )}`}
+                          >
+                            {d.findrisc ?? "-"}
+                          </span>
+                        </td>
+
+                        <td>
+                          <span
+                            className={`score-circle ${getFraminghamColorClass(
+                              d.framingham
+                            )}`}
+                          >
+                            {d.framingham ?? "-"}
+                          </span>
+                        </td>
+
+                        <td>
+                          <span
+                            className={`score-circle ${getLawtonColorClass(
+                              d.lawtonBrody
+                            )}`}
+                          >
+                            {d.lawtonBrody ?? "-"}
+                          </span>
+                        </td>
+
+                        <td>
+                          <span
+                            className={`score-circle ${getMoriskyGreenColorClass(
+                              d.moriskyGreen
+                            )}`}
+                          >
+                            {d.moriskyGreen ?? "-"}
+                          </span>
+                        </td>
+
+                        <td>{format(parseISO(d.fecha), "dd/MM/yyyy")}</td>
+                        <td className="intervention-cell">
+                          <div className="intervention-content">
+                            {(() => {
+                              const necesita = necesitaIntervencion(d);
+
+                              const intervencionesPaciente =
+                                intervenciones.filter(
+                                  (interv) =>
+                                    interv.pacienteTipo ===
+                                      d.tipoIdentificacion &&
+                                    interv.pacienteNumero ===
+                                      d.identificacion &&
+                                    interv.fechaEncuesta === d.fecha
+                                );
+
+                              const estaCerrada = intervencionesPaciente.some(
+                                (interv) => interv.cerrada
+                              );
+
+                              if (!necesita) {
+                                // No requiere intervención
+                                return (
+                                  <>
+                                    <XCircleIcon
+                                      style={{
+                                        color: "#9E9E9E",
+                                        fontSize: "0.95rem",
+                                      }}
+                                      aria-label="No requerida"
+                                    />
+                                    <span
+                                      style={{
+                                        color: "#666",
+                                        fontSize: "0.95rem",
+                                      }}
+                                    >
+                                      No requerida
+                                    </span>
+                                  </>
+                                );
+                              } else if (estaCerrada) {
+                                // Ya completada
+                                return (
+                                  <>
+                                    <CheckCircleIcon
+                                      style={{
+                                        color: "#00C853",
+                                        fontSize: "0.95rem",
+                                      }}
+                                      aria-label="Completada"
+                                    />
+                                    <span
+                                      style={{
+                                        color: "#666",
+                                        fontSize: "0.95rem",
+                                      }}
+                                    >
+                                      Completada
+                                    </span>
+                                  </>
+                                );
+                              } else {
+                                // Pendiente (botón de intervención)
+                                return (
+                                  <>
+                                    <button
+                                      onClick={() => {
+                                        setSelectedPatient({
+                                          _id: "",
+                                          tipoIdentificacion:
+                                            d.tipoIdentificacion,
+                                          identificacion: d.identificacion,
+                                          nombre: d.nombre,
+                                          findrisc: d.findrisc,
+                                          framingham: d.framingham,
+                                          lawtonBrody: d.lawtonBrody,
+                                          fecha: d.fecha,
+                                        });
+                                        setInterventionText("");
+                                        setIsModalOpen(true);
+                                      }}
+                                      style={{
+                                        background: "transparent",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "6px",
+                                      }}
+                                      title="Registrar intervención"
+                                    >
+                                      <AlertCircleIcon
+                                        style={{
+                                          color: "#FF0000",
+                                          fontSize: "0.95rem",
+                                        }}
+                                      />
+                                      <span
+                                        style={{
+                                          color: "#FF0000",
+                                          fontSize: "0.95rem",
+                                        }}
+                                      >
+                                        Pendiente
+                                      </span>
+                                    </button>
+
+                                    <InterventionModal
+                                      key={
+                                        selectedPatient
+                                          ? `${selectedPatient.tipoIdentificacion}-${selectedPatient.identificacion}-${selectedPatient.fecha}`
+                                          : "empty"
+                                      }
+                                      isOpen={isModalOpen}
+                                      onClose={() => {
+                                        setIsModalOpen(false);
+                                        setInterventionText("");
+                                        setSelectedPatient(null);
+                                      }}
+                                      onSave={handleRegistrarIntervencion}
+                                      intervencionesAnteriores={
+                                        selectedPatient
+                                          ? intervenciones.filter(
+                                              (interv) =>
+                                                interv.pacienteTipo ===
+                                                  selectedPatient.tipoIdentificacion &&
+                                                interv.pacienteNumero ===
+                                                  selectedPatient.identificacion
+                                            )
+                                          : []
+                                      }
+                                      onRefresh={cargarDatos}
+                                      text={interventionText}
+                                      setText={setInterventionText}
+                                    />
+                                  </>
+                                );
+                              }
+                            })()}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Paginador */}
+                <div className="pagination">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    « Anterior
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, index) => (
+                    <button
+                      key={index + 1}
+                      className={currentPage === index + 1 ? "active" : ""}
+                      onClick={() => handlePageChange(index + 1)}
+                    >
+                      {index + 1}
+                    </button>
                   ))}
-                </tbody>
-              </table>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Siguiente »
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <EmptyMessage message="No se encontraron datos en tu búsqueda." />
@@ -808,33 +861,6 @@ const SurveyTable: React.FC = () => {
             {format(ultimaActualizacion, "dd/MM/yyyy HH:mm:ss")}
           </p>
         )}
-
-        {/* Paginador */}
-        <div className="pagination">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            « Anterior
-          </button>
-
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index + 1}
-              className={currentPage === index + 1 ? "active" : ""}
-              onClick={() => handlePageChange(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Siguiente »
-          </button>
-        </div>
       </div>
     </div>
   );
