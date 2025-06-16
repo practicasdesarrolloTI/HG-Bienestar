@@ -1,7 +1,7 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8001/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://18.207.0.161:3001/api";
 
 interface DecodedToken {
   exp: number;

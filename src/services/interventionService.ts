@@ -2,7 +2,7 @@ import axios from "axios";
 import { getToken } from "./authService";
 import { Intervencion } from "../types/Intervenciones.type";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8001/api/intervenciones";
+const API_URL = import.meta.env.VITE_API_URL || "http://18.207.0.161:3001/api/intervenciones";
 
 export const registrarIntervencion = async (
   pacienteTipo: string,
