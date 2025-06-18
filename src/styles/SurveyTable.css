@@ -92,7 +92,7 @@
   .cards-grid {
     grid-template-columns: repeat(4, 1fr);
   }
-    .card .card-inner {
+  .card .card-inner {
     flex-direction: row;
     justify-content: space-between;
   }
@@ -157,9 +157,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 .survey-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   border-bottom: 1px solid var(--gray-3);
   border-radius: 12px 12px 0 0;
   padding: 1rem;
@@ -176,8 +173,43 @@
 .filters-container {
   display: flex;
   flex-direction: row;
-  gap: 0.5rem;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
+  width: 95%;
+  gap: 1rem;
+  padding: 1rem 0;
+  overflow: visible;
+}
+.input {
+  display: flex;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  height: 50%;
+  min-width: 170px;
+  font-size: 0.7rem;
+  box-sizing: border-box;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  border: 1.5px solid var(--gray-3);
+}
+.react-datepicker__current-month {
+  align-items: center;
+  justify-content: center;
+  text-transform: capitalize;
+}
+.little-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background-color: var(--white);
+  border: 1.5px solid var(--gray-3);
+  cursor: pointer;
+  color: var(--gray-1);
+  font-size: 0.8rem;
 }
 .btn-icon {
   display: flex;
@@ -191,19 +223,7 @@
   cursor: pointer;
   color: var(--gray-1);
 }
-.search-input {
-  display: flex;
-  padding: 0.8rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  min-height: 40px;
-  box-sizing: border-box;
-  white-space: nowrap;
-  font-weight: 400;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-  border: 1.5px solid var(--gray-3);
-}
+
 .info-card {
   display: flex;
   flex-direction: column;
@@ -344,13 +364,6 @@
 .pagination button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
-}
-.datepicker-input {
-  padding: 0.3rem 0.5rem;
-  font-size: 0.8rem;
-  width: 120px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
 }
 
 @media (min-width: 768px) {

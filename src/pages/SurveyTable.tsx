@@ -8,6 +8,9 @@ import {
   isWithinInterval,
   differenceInMonths,
 } from "date-fns";
+import { registerLocale } from  "react-datepicker";
+import { es } from 'date-fns/locale/es';
+registerLocale('es', es)
 import "../styles/SurveyTable.css";
 import {
   CheckCircleIcon,
@@ -15,7 +18,6 @@ import {
   AlertCircleIcon,
   FileTextIcon,
   FileUserIcon,
-  FunnelIcon,
 } from "lucide-react";
 import { getSurveyResults } from "../services/surveyResultService";
 import { SurveyResult, Agrupado } from "../types/Survey.type";
@@ -31,7 +33,7 @@ import {
 import { getCurrentUser } from "../services/authService";
 import { Intervencion } from "../types/Intervenciones.type";
 import { toast } from "react-toastify";
-import FiltersModal from "../components/FiltersModal";
+import DatePicker from "react-datepicker";
 
 const agruparPorPacienteYPeriodo = (datos: SurveyResult[]): Agrupado[] => {
   const grupos: Agrupado[] = [];
@@ -124,6 +126,18 @@ const necesitaIntervencion = (row: SurveyResult | Agrupado): boolean => {
     mog === "Alto"
   );
 };
+const scaleOptions: Record<string, string[]> = {
+  findrisc: ["Bajo", "Aumentado", "Moderado", "Alto", "Muy Alto", "Sin dato"],
+  framingham: ["Bajo", "Moderado", "Alto", "Sin dato"],
+  lawton: [
+    "Independiente",
+    "Dependencia Leve",
+    "Dependencia Moderada",
+    "Dependencia Total",
+    "Sin dato",
+  ],
+  moriskyGreen: ["Bajo", "Alto", "Sin dato"],
+};
 
 const SurveyTable: React.FC = () => {
   const [fechaInicio, setFechaInicio] = useState<Date | null>(null);
@@ -135,7 +149,6 @@ const SurveyTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<SurveyResult | null>(
     null
   );
@@ -144,18 +157,14 @@ const SurveyTable: React.FC = () => {
     null
   );
   const [interventionText, setInterventionText] = useState("");
-  const [selectedTipos, setSelectedTipos] = useState<string[]>([]);
-  const [selectedFindriscCats, setSelectedFindriscCats] = useState<string[]>(
-    []
-  );
-  const [selectedFraminghamCats, setSelectedFraminghamCats] = useState<
-    string[]
-  >([]);
-  const [selectedLawtonCats, setSelectedLawtonCats] = useState<string[]>([]);
-  const [selectedMoriskyCats, setSelectedMoriskyCats] = useState<string[]>([]);
-  const [selectedIntervencion, setSelectedIntervencion] = useState<string[]>(
-    []
-  );
+
+  const [tipoFiltro, setTipoFiltro] = useState("");
+  const [escalaSeleccionada, setEscalaSeleccionada] = useState("");
+  const [findriscFiltro, setFindriscFiltro] = useState("");
+  const [framinghamFiltro, setFraminghamFiltro] = useState("");
+  const [lawtonFiltro, setLawtonFiltro] = useState("");
+
+  const [intervencionFiltro, setIntervencionFiltro] = useState("");
 
   const datosAgrupados = agruparPorPacienteYPeriodo(data);
 
@@ -291,76 +300,34 @@ const SurveyTable: React.FC = () => {
   const filteredData = datosAgrupados.filter((row) => {
     const fechaEncuesta = parseISO(row.fecha);
 
-    if (
-      selectedTipos.length > 0 &&
-      !selectedTipos.includes(row.tipoIdentificacion)
-    ) {
-      return false;
-    }
-    const findriscCat = getFindriscCategoria(row.findrisc);
-    if (
-      selectedFindriscCats.length > 0 &&
-      !selectedFindriscCats.includes(findriscCat)
-    ) {
-      return false;
-    }
-    const framinghamCat = getFraminghamCategoria(row.framingham);
-    if (
-      selectedFraminghamCats.length > 0 &&
-      !selectedFraminghamCats.includes(framinghamCat)
-    ) {
-      return false;
-    }
-    const lawtonCat = getLawtonCategoria(row.lawtonBrody);
-    if (
-      selectedLawtonCats.length > 0 &&
-      !selectedLawtonCats.includes(lawtonCat)
-    ) {
-      return false;
-    }
-    const moriskyCat = getmoriskyGreenCategoria(row.moriskyGreen ?? null);
-    if (
-      selectedMoriskyCats.length > 0 &&
-      !selectedMoriskyCats.includes(moriskyCat)
-    ) {
-      return false;
-    }
-    if (
-      fechaInicio &&
-      fechaFin &&
-      !isWithinInterval(fechaEncuesta, {
-        start: fechaInicio,
-        end: fechaFin,
-      })
-    ) {
-      return false;
-    }
-    const necesita = necesitaIntervencion(row);
-
-    if (
-      selectedIntervencion.length > 0 &&
-      selectedIntervencion.includes("Sí") &&
-      !necesita
-    ) {
-      return false;
-    }
-    if (
-      selectedIntervencion.length > 0 &&
-      selectedIntervencion.includes("No") &&
-      necesita
-    ) {
-      return false;
-    }
-    if (
-      busquedaDocumento &&
-      !row.identificacion
-        .toLowerCase()
-        .includes(busquedaDocumento.toLowerCase())
-    ) {
-      return false;
-    }
-
-    return true;
+    return (
+      (tipoFiltro === "" || row.tipoIdentificacion === tipoFiltro) &&
+      (escalaSeleccionada === "findrisc"
+        ? findriscFiltro === "" ||
+          getFindriscCategoria(row.findrisc) === findriscFiltro
+        : true) &&
+      (escalaSeleccionada === "framingham"
+        ? framinghamFiltro === "" ||
+          getFraminghamCategoria(row.framingham) === framinghamFiltro
+        : true) &&
+      (escalaSeleccionada === "lawton"
+        ? lawtonFiltro === "" ||
+          getLawtonCategoria(row.lawtonBrody) === lawtonFiltro
+        : true) &&
+      (!fechaInicio ||
+        !fechaFin ||
+        isWithinInterval(fechaEncuesta, {
+          start: fechaInicio,
+          end: fechaFin,
+        })) &&
+      (intervencionFiltro === "" ||
+        (intervencionFiltro === "si" && necesitaIntervencion(row)) ||
+        (intervencionFiltro === "no" && !necesitaIntervencion(row))) &&
+      (busquedaDocumento === "" ||
+        row.identificacion
+          .toLowerCase()
+          .includes(busquedaDocumento.toLowerCase()))
+    );
   });
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -369,25 +336,7 @@ const SurveyTable: React.FC = () => {
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
   /*Modal*/
-  const toggleFiltersModal = () => {
-    setShowFilters(!showFilters);
-  };
 
-  const applyFilters = () => {
-    setCurrentPage(1);
-    setShowFilters(false);
-  };
-  const clearAllFilters = () => {
-    setSelectedTipos([]);
-    setSelectedFindriscCats([]);
-    setSelectedFraminghamCats([]);
-    setSelectedLawtonCats([]);
-    setSelectedMoriskyCats([]);
-    setFechaInicio(null);
-    setFechaFin(null);
-    setSelectedIntervencion([]);
-    setBusquedaDocumento("");
-  };
   const exportToExcel = () => {
     const hoy = new Date();
     const nombreArchivo = `encuestas_${format(hoy, "yyyyMMdd_HHmm")}.xlsx`;
@@ -563,42 +512,150 @@ const SurveyTable: React.FC = () => {
             <div className="filters-container">
               <input
                 type="text"
-                placeholder="Buscar por documento..."
+                placeholder="Número de documento"
                 value={busquedaDocumento}
                 onChange={(e) => setBusquedaDocumento(e.target.value)}
-                className="search-input"
+                className="input"
               />
 
-              <button onClick={toggleFiltersModal} className="btn-icon">
-                <FunnelIcon size={16} />
+              <select
+                value={tipoFiltro}
+                onChange={(e) => setTipoFiltro(e.target.value)}
+                className="input"
+              >
+                <option value="" disabled hidden>
+                  Tipo de documento
+                </option>
+                <option value="">Todos</option>
+                <option value="CC">CC</option>
+                <option value="TI">TI</option>
+                <option value="CE">CE</option>
+              </select>
+
+              <select
+                value={escalaSeleccionada}
+                onChange={(e) => {
+                  setEscalaSeleccionada(e.target.value);
+                  setFindriscFiltro("");
+                  setFraminghamFiltro("");
+                  setLawtonFiltro("");
+                }}
+                className="input"
+              >
+                <option value="">Todos</option>
+                <option value="" disabled hidden>
+                  Encuesta
+                </option>
+                <option value="findrisc">FINDRISC</option>
+                <option value="framingham">Framingham</option>
+                <option value="lawton">Lawton-Brody</option>
+              </select>
+
+              <select
+                value={
+                  escalaSeleccionada === "findrisc"
+                    ? findriscFiltro
+                    : escalaSeleccionada === "framingham"
+                    ? framinghamFiltro
+                    : escalaSeleccionada === "lawton"
+                    ? lawtonFiltro
+                    : ""
+                }
+                onChange={(e) => {
+                  switch (escalaSeleccionada) {
+                    case "findrisc":
+                      setFindriscFiltro(e.target.value);
+                      break;
+                    case "framingham":
+                      setFraminghamFiltro(e.target.value);
+                      break;
+                    case "lawton":
+                      setLawtonFiltro(e.target.value);
+                      break;
+                  }
+                }}
+                disabled={!escalaSeleccionada}
+                className="input"
+              >
+                <option value="" disabled hidden>
+                  Tipo de riesgo
+                </option>
+
+                {escalaSeleccionada &&
+                  scaleOptions[escalaSeleccionada].map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+              </select>
+
+              <select
+                value={intervencionFiltro}
+                onChange={(e) => setIntervencionFiltro(e.target.value)}
+                className="input"
+              >
+                <option value="" disabled hidden>
+                  Intervención
+                </option>
+                <option value="">Todos</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+              </select>
+
+              <DatePicker
+                placeholderText="Fecha inicial"
+                locale={'es'}
+                selected={fechaInicio}
+                onChange={(date) => setFechaInicio(date)}
+                dateFormat="dd/MM/yyyy"
+                className="input"
+                isClearable
+                popperContainer={({ children }) => (
+                  <div style={{ position: "absolute", zIndex: 1000 }}>
+                    {children}
+                  </div>
+                )}
+                popperPlacement="bottom-start"
+              />
+
+              <DatePicker
+                placeholderText="Fecha final"
+                selected={fechaFin}
+                locale={'es'}
+                onChange={(date) => setFechaFin(date)}
+                dateFormat="dd/MM/yyyy"
+                className="input"
+                isClearable
+                popperContainer={({ children }) => (
+                  <div style={{ position: "absolute", zIndex: 1000 }}>
+                    {children}
+                  </div>
+                )}
+                popperPlacement="bottom-start"
+              />
+
+              <button
+                onClick={() => {
+                  setTipoFiltro("");
+                  setEscalaSeleccionada("");
+                  setFindriscFiltro("");
+                  setFraminghamFiltro("");
+                  setLawtonFiltro("");
+                  setBusquedaDocumento("");
+                  setIntervencionFiltro("");
+                  setFechaInicio(null);
+                  setFechaFin(null);
+                }}
+                className="little-btn"
+              >
+                Limpiar filtros
               </button>
+                           
+
             </div>
           </div>
-                       <FiltersModal
-                show={showFilters}
-                onClose={() => setShowFilters(false)}
-                onApply={applyFilters}
-                onClearAll={clearAllFilters}
-                selectedTipos={selectedTipos}
-                setSelectedTipos={setSelectedTipos}
-                selectedFindriscCats={selectedFindriscCats}
-                setSelectedFindriscCats={setSelectedFindriscCats}
-                selectedFraminghamCats={selectedFraminghamCats}
-                setSelectedFraminghamCats={setSelectedFraminghamCats}
-                selectedLawtonCats={selectedLawtonCats}
-                setSelectedLawtonCats={setSelectedLawtonCats}
-                selectedMoriskyCats={selectedMoriskyCats}
-                setSelectedMoriskyCats={setSelectedMoriskyCats}
-                fechaInicio={fechaInicio}
-                setFechaInicio={setFechaInicio}
-                fechaFin={fechaFin}
-                setFechaFin={setFechaFin}
-                selectedIntervencion={selectedIntervencion}
-                setSelectedIntervencion={setSelectedIntervencion}
-              /> 
           {filteredData.length > 0 ? (
             <div className="info-card">
-              
               <div className="table-responsive">
                 <table className="survey-table">
                   <thead>
